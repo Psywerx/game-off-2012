@@ -1,0 +1,6 @@
+[submodule "gl-matrix"]
+	path = gl-matrix
+	url = git://github.com/toji/gl-matrix.git
+[submodule "underscore"]
+	path = underscore
+	url = git://github.com/documentcloud/underscore.git
