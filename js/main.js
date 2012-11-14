@@ -12,9 +12,10 @@ Main = {
 		// Create shaders:
 		this.program = ProgramUtils.createProgram($("#shader-vs").html(), $("#shader-fs").html());
 		
-		gl.bindAttribLocation(this.program, 0, "attribute_Position");
-        gl.bindAttribLocation(this.program, 1, "attribute_Color");
-		
+		this.positionLoc = gl.getAttribLocation(this.program, "attribute_Position");
+        this.colorLoc = gl.getAttribLocation(this.program, "attribute_Color");
+        this.texLoc = gl.getAttribLocation(this.program, "a_texCoord");
+		console.log(this.positionLoc, this.colorLoc, this.texLoc);
 		
 		this.projectionMatrix_location = gl.getUniformLocation(this.program, "uniform_Projection");
 	    this.modelMatrix_location = gl.getUniformLocation(this.program, "uniform_Model");
