@@ -54,6 +54,7 @@ ProgramUtils = function() {
 		loadFile(fs, fshaderLoaded, true);
 		return program;
 	}
+
 	return {
 		loadProgram : loadProgram,
 		createProgram : createProgram
