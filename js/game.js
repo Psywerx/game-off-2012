@@ -4,7 +4,7 @@ var game = {
 	},
 	draw : function(gl){
 		gl.enable(gl.DEPTH_TEST);
-        gl.clearColor(1, 1, 1, 1);
+        gl.clearColor(0, 1, 1, 1);
         gl.clear(gl.STENCIL_BUFFER_BIT | gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.useProgram(Main.program);
         gl.uniform1i(Main.sampler_location, 0);
