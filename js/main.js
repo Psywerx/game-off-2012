@@ -2,6 +2,11 @@
 Main = {
 		
 	init : function(){
+		
+		$(document).keydown(game.keydown);
+		$(document).keyup(game.keyup);
+		
+		
 		this.canvas = $("#the-canvas")[0];
 		
 		gl = WebGLUtils.setupWebGL(this.canvas);
@@ -11,8 +16,8 @@ Main = {
 		
 		this.WIDTH = this.canvas.width;
 		this.HEIGHT = this.canvas.height;
-		// Create shaders:
 		
+		// Create shaders:
 		this.program = ProgramUtils.createProgram($("#shader-vs").html(), $("#shader-fs").html());
 		_.extend(this.program, {
 			positionLoc : gl.getAttribLocation(this.program, "attribute_Position"),
@@ -25,6 +30,8 @@ Main = {
 		});
 		
 	    this.t0 = Date.now();
+	    
+	    game.init();
 	    
 	    var image = new Image();
 		image.src = "res/text.png";
@@ -52,7 +59,8 @@ Main = {
 		var t1 = Date.now();
 		var theta = (t1 - this.t0) * 0.001;
 		this.t0 = t1;
-		  
+		if(_.isNaN(theta)) // XXX sometimes theta is NaN?!?
+			return;
 		game.tick(theta);
 		game.draw(gl);
 	}
