@@ -5,6 +5,7 @@ Object = function(){
 	object.position = [Math.random()*game.bg.size[0]*2-game.bg.size[0], -1*game.bg.size[1], Math.random()/100];
 	object.char = 'A';
 	object.isText = true;
+	object.collissionModifier = 0.5;
 	
 	return {
 		velocity : [0,Math.random(),0],
@@ -14,11 +15,11 @@ Object = function(){
 			if(object.position[1] > game.bg.size[1])
 				object.position[1] = -1*game.bg.size[1];
 			
-			if(object.position[1] + object.size[1] > game.player.position[1] - game.player.size[1] &&
-					object.position[1] - object.size[1] < game.player.position[1] + game .player.size[1]){
+			if(object.position[1] + object.size[1]*object.collissionModifier > game.player.position[1] - game.player.size[1] * game.player.collissionModifier &&
+					object.position[1] - object.size[1]*object.collissionModifier < game.player.position[1] + game .player.size[1] * game.player.collissionModifier ){
 				
-				if(object.position[0] + object.size[0] > game.player.position[0] - game.player.size[0] &&
-						object.position[0] - object.size[0] < game.player.position[0] + game .player.size[0]){
+				if(object.position[0] + object.size[0]*object.collissionModifier > game.player.position[0] - game.player.size[0] * game.player.collissionModifier &&
+						object.position[0] - object.size[0]*object.collissionModifier < game.player.position[0] + game .player.size[0] * game.player.collissionModifier ){
 					object.color = [0,0,1,1];
 					
 				}
@@ -47,6 +48,7 @@ Player = function(){
 		direction : [0,0,0],
 		position : player.position,
 		size : player.size,
+		collissionModifier : 0.4,
 		tick : function(theta){
 			this.speed[0] += theta*2;
 			this.speed[1] += theta*2;
