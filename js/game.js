@@ -3,7 +3,13 @@ var game = {
 	init : function(){
 		this.bg = new Background();
 		this.player = new Player();
+		this.objects = [];
+		for(var i=0; i < 5; i++){
+			this.objects.push(new Object());
+		}
+		this.objectsSpawner = 2;
 		this.smooth = 0;
+		this.timeline = 0;
 	},
 	keydown : function(event){
 		switch (event.keyCode) {
@@ -26,9 +32,13 @@ var game = {
         }
 	},
 	tick : function(theta){
+		this.timeline += theta;
 		this.bg.tick(theta);
 		this.player.tick(theta);
 		this.smooth = 0.8*this.smooth + 0.2*(game.player.direction[0] + game.player.direction[1]);
+		for(var i=0; i < this.objects.length; i++){
+			this.objects[i].tick(theta);
+        }
 	},
 	draw : function(gl){
 		
@@ -56,6 +66,9 @@ var game = {
         
         this.bg.draw(gl);
         this.player.draw(gl);
+        for(var i=0; i < this.objects.length; i++){
+        	this.objects[i].draw(gl);
+        }
 //        // Draw actual stuff:
 //        bg.bgSquare.z = 0.1f;
 //         bg.draw(gl);

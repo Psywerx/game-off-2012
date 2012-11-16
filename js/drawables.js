@@ -1,8 +1,26 @@
+Object = function(){
+	var object = new Square();
+	object.color = [1,0,0,1];
+	object.size  = [Math.random()/10,Math.random()/10,0];
+	object.position = [Math.random()*game.bg.size[0]*2-game.bg.size[0], -1*game.bg.size[1], 0];
+	
+	return {
+		velocity : [0,Math.random(),0],
+		tick : function(theta){
+			object.position[1] += theta * this.velocity[1];
+			if(object.position[1] > game.bg.size[1])
+				object.position[1] = -1*game.bg.size[1];
+		},
+		draw : function(gl){
+			object.draw(gl);
+		}
+	};
+};
+
 Player = function(){
 	var player = new Square();
 	player.color = [1,1,0,1];
-	player.size = 0.05;
-	
+	player.size  = [0.05, 0.1, 1];
 	return {
 		speed : [0,0,0],
 		direction : [0,0,0],
@@ -17,21 +35,17 @@ Player = function(){
 			}
 			player.position[0] += (this.direction[0] + this.direction[1]) * theta * 2 * (this.speed[0]+this.speed[1]);
 			//player.rotateAngle = this.direction[0]*0.0001;
-			
-			if (player.position[0] < -1.45) {
-	            player.position[0] = -1.45;
+			if (player.position[0] < -1*(game.bg.size[0]-player.size[0])) {
+	            player.position[0] = -1*(game.bg.size[0]-player.size[0]);
 	            this.speed[0] = 0;
 	        }
-	        if (player.position[0] > 1.45) {
-	            player.position[0] = 1.45;
+	        if (player.position[0] > (game.bg.size[0]-player.size[0])) {
+	            player.position[0] = (game.bg.size[0]-player.size[0]);
 	            this.speed[0] = 0;
 	        }
 			
 		},
 		draw : function(gl){
-			
-			
-			
 			player.draw(gl);
 		}
 	};
@@ -40,12 +54,14 @@ Player = function(){
 Background = function(){
 	
 	var bg = new Square();
-	bg.size = 1.5;
+	bg.size = [1.72, 1.5, 1];
 	bg.color = [0.2, 0.2, 0.2, 1.0];
 	bg.position = [0,0,0.01];
 	
 	return{
+		size : bg.size,
 		tick : function(theta){
+			bg.size = this.size;
 		},
 		draw : function(gl){
 			bg.draw(gl);
@@ -56,7 +72,7 @@ Background = function(){
 Square = function(){
 	return{
 		
-		size     : 1.0,
+		size     : [1,1,1],
 		position : [0.0, 0.4, 0],
 		velocity : [0, 0, 0],
 		color    : [0, 0, 0, 1],
@@ -76,7 +92,7 @@ Square = function(){
 	        gl.uniformMatrix4fv(program.modelMatrix_location, false, modelMatrix);
 	        
 	        var vertices = [1.0, 1.0, 0.0, -1.0, 1.0, 0.0, 1.0, -1.0, 0.0, -1.0, -1.0, 0.0];
-	        vertices = _.map(vertices, function(i){return i * self.size;});
+	        vertices = _.map(vertices, function(num,i){return num * self.size[i%3];});
 	        var vertBuffer =  gl.createBuffer();
 	        gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer);
 	        gl.enableVertexAttribArray(program.positionLoc);
