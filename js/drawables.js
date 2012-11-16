@@ -1,8 +1,8 @@
 Object = function(){
 	var object = new Square();
 	object.color = [1,0,0,1];
-	object.size  = [Math.random()/10,Math.random()/10,0];
-	object.position = [Math.random()*game.bg.size[0]*2-game.bg.size[0], -1*game.bg.size[1], 0];
+	object.size  = [0.1,0.1,0];
+	object.position = [Math.random()*game.bg.size[0]*2-game.bg.size[0], -1*game.bg.size[1], Math.random()/100];
 	
 	return {
 		velocity : [0,Math.random(),0],
@@ -10,6 +10,22 @@ Object = function(){
 			object.position[1] += theta * this.velocity[1];
 			if(object.position[1] > game.bg.size[1])
 				object.position[1] = -1*game.bg.size[1];
+			
+			if(object.position[1] + object.size[1] > game.player.position[1] - game.player.size[1] &&
+					object.position[1] - object.size[1] < game.player.position[1] + game .player.size[1]){
+				
+				if(object.position[0] + object.size[0] > game.player.position[0] - game.player.size[0] &&
+						object.position[0] - object.size[0] < game.player.position[0] + game .player.size[0]){
+					object.color = [0,0,1,1];
+					
+				}
+				else{
+					object.color = [0,1,1,1];
+				}
+			}
+			else{
+				object.color = [1,0,0,1];
+			}
 		},
 		draw : function(gl){
 			object.draw(gl);
@@ -20,10 +36,12 @@ Object = function(){
 Player = function(){
 	var player = new Square();
 	player.color = [1,1,0,1];
-	player.size  = [0.05, 0.1, 1];
+	player.size  = [0.1, 0.1, 1];
 	return {
 		speed : [0,0,0],
 		direction : [0,0,0],
+		position : player.position,
+		size : player.size,
 		tick : function(theta){
 			this.speed[0] += theta*2;
 			this.speed[1] += theta*2;
@@ -43,6 +61,8 @@ Player = function(){
 	            player.position[0] = (game.bg.size[0]-player.size[0]);
 	            this.speed[0] = 0;
 	        }
+	        this.position = player.position;
+	        player.size = this.size;
 			
 		},
 		draw : function(gl){
@@ -77,6 +97,7 @@ Square = function(){
 	var vertBuffer =  gl.createBuffer();
 	var colorBuffer = gl.createBuffer();
 	var texBuffer = gl.createBuffer();
+	var arrayVertices = new Float32Array(vertices);
 	
 	return{
 		
@@ -101,7 +122,8 @@ Square = function(){
 	        vertices = _.map(vertices, function(num,i){return num * this.size[i%3];}, this);
 	        gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer);
 	        gl.enableVertexAttribArray(program.positionLoc);
-	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+	        arrayVertices.set(vertices);
+	        gl.bufferData(gl.ARRAY_BUFFER, arrayVertices, gl.STATIC_DRAW);
 	        gl.vertexAttribPointer(program.positionLoc, 3, gl.FLOAT, false, 0, 0);
 	        var colors = _.flatten([this.color, this.color, this.color, this.color]);
 	        gl.enableVertexAttribArray(program.colorLoc);
@@ -138,8 +160,6 @@ Square = function(){
 	        gl.disableVertexAttribArray(program.tecLoc);
 		},
 		tick: function(theta){
-			this.isText = true;
-			this.char = 'D';
 		}
 		
 	};
