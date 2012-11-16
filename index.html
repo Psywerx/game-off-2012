@@ -15,10 +15,8 @@
 <script type="text/javascript" src="js/main.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
-#ifdef GL_ES 
 precision mediump float; 
 precision mediump int; 
-#endif 
 
 varying   vec4    varying_Color;  //incomming varying data to the
                                        //frament shader
@@ -26,19 +24,14 @@ varying vec2 v_texCoord;
 uniform sampler2D s_texture; 
 uniform float u_isText; 
 void main (void) { 
-  if(u_isText < 0.5){
-    vec4 texture = texture2D(s_texture, v_texCoord.st); 
-    gl_FragColor = texture + (texture.w * varying_Color); 
-  } else { 
+
     gl_FragColor = varying_Color; 
-  }
+
 }
 </script>
 <script id="shader-vs" type="x-shader/x-vertex">
-#ifdef GL_ES 
 precision mediump float;  // Precision Qualifiers
 precision mediump int;    // GLSL ES section 4.5.2
-#endif 
 
 uniform mat4    uniform_Projection;  // Incomming data used by
 uniform mat4    uniform_Model;  // Incomming data used by

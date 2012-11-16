@@ -54,7 +54,7 @@ Player = function(){
 Background = function(){
 	
 	var bg = new Square();
-	bg.size = [1.72, 1.5, 1];
+	bg.size = [1.72, 1.40, 1];
 	bg.color = [0.2, 0.2, 0.2, 1.0];
 	bg.position = [0,0,0.01];
 	
@@ -70,6 +70,14 @@ Background = function(){
 };
 
 Square = function(){
+	
+	var program = Main.program;
+	var modelMatrix = mat4.identity();
+	var vertices = [1.0, 1.0, 0.0, -1.0, 1.0, 0.0, 1.0, -1.0, 0.0, -1.0, -1.0, 0.0];
+	var vertBuffer =  gl.createBuffer();
+	var colorBuffer = gl.createBuffer();
+	var texBuffer = gl.createBuffer();
+	
 	return{
 		
 		size     : [1,1,1],
@@ -83,23 +91,19 @@ Square = function(){
 		
 		draw: function(gl){
 			
-			var program = Main.program;
-			var self = this;
 			
-			var modelMatrix = mat4.translate(mat4.identity(), self.position);
+			
+			modelMatrix = mat4.translate(mat4.identity(), this.position);
 			modelMatrix = mat4.rotate(modelMatrix, Math.PI, [0, 1, 0]);
 			modelMatrix = mat4.rotate(modelMatrix, this.rotateAngle, this.rotateAxis);
 	        gl.uniformMatrix4fv(program.modelMatrix_location, false, modelMatrix);
-	        
-	        var vertices = [1.0, 1.0, 0.0, -1.0, 1.0, 0.0, 1.0, -1.0, 0.0, -1.0, -1.0, 0.0];
-	        vertices = _.map(vertices, function(num,i){return num * self.size[i%3];});
-	        var vertBuffer =  gl.createBuffer();
+	        vertices = [1.0, 1.0, 0.0, -1.0, 1.0, 0.0, 1.0, -1.0, 0.0, -1.0, -1.0, 0.0];
+	        vertices = _.map(vertices, function(num,i){return num * this.size[i%3];}, this);
 	        gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer);
 	        gl.enableVertexAttribArray(program.positionLoc);
 	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 	        gl.vertexAttribPointer(program.positionLoc, 3, gl.FLOAT, false, 0, 0);
-	        var colors = _.flatten([self.color, self.color, self.color, self.color]);
-	        var colorBuffer = gl.createBuffer();
+	        var colors = _.flatten([this.color, this.color, this.color, this.color]);
 	        gl.enableVertexAttribArray(program.colorLoc);
 	        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
@@ -119,7 +123,6 @@ Square = function(){
 	                uVal * charWidth, (vVal + 1) * charWidth, 
 	        ];
 	        
-	        var texBuffer = gl.createBuffer();
 	        
 	        gl.enableVertexAttribArray(program.texLoc);
 	        gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);

@@ -1,11 +1,11 @@
 var game = {
 		
 	init : function(){
-		this.bg = new Background();
-		this.player = new Player();
+		this.bg = Background();
+		this.player = Player();
 		this.objects = [];
-		for(var i=0; i < 5; i++){
-			this.objects.push(new Object());
+		for(var i=0; i < 50; i++){
+			this.objects.push(Object());
 		}
 		this.objectsSpawner = 2;
 		this.smooth = 0;
