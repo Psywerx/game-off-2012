@@ -3,8 +3,6 @@ Object = function(){
 	object.color = [1,0,0,1];
 	object.size  = [0.1,0.1,0];
 	object.position = [Math.random()*game.bg.size[0]*2-game.bg.size[0], -1*game.bg.size[1], Math.random()/100];
-	object.char = 'A';
-	object.isText = true;
 	object.collissionModifier = 0.5;
 	
 	return {
@@ -21,7 +19,6 @@ Object = function(){
 				if(object.position[0] + object.size[0]*object.collissionModifier > game.player.position[0] - game.player.size[0] * game.player.collissionModifier &&
 						object.position[0] - object.size[0]*object.collissionModifier < game.player.position[0] + game .player.size[0] * game.player.collissionModifier ){
 					object.color = [0,0,1,1];
-					
 				}
 				else{
 					object.color = [0,1,1,1];
@@ -40,9 +37,10 @@ Object = function(){
 Player = function(){
 	var player = new Square();
 	player.color = [1,1,0,1];
-	player.size  = [0.1, 0.1, 1];
-	player.char = 'B';
-	player.isText = true;
+	player.size  = [0.1, 0.2, 1];
+	player.texture.enabled = true;
+	player.texture.sprite = [4,2];
+	player.texture.size = [2,3];
 	return {
 		speed : [0,0,0],
 		direction : [0,0,0],
@@ -113,13 +111,20 @@ Square = function(){
 		velocity : [0, 0, 0],
 		color    : [0, 0, 0, 1],
 		char     : ' ',
-		isText   : false,
+		texture  : {
+			NUM_SPRITES : 16,
+			enabled: false,
+			sprite : [0, 0],
+			size   : [1, 1],
+			fromChar : function(c){
+				var charIndex = c.charCodeAt(0) - 32;
+		        this.sprite = [(charIndex % this.NUM_SPRITES), Math.floor(charIndex / this.NUM_SPRITES)];
+			}
+		},
 		rotateAngle : 0,
 		rotateAxis  : [0, 1, 0],
 		
 		draw: function(gl){
-			
-			
 			
 			modelMatrix = mat4.translate(mat4.identity(), this.position);
 			modelMatrix = mat4.rotate(modelMatrix, Math.PI, [0, 1, 0]);
@@ -138,26 +143,11 @@ Square = function(){
 	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 	        gl.vertexAttribPointer(program.colorLoc, 4, gl.FLOAT, false, 0, 0);
 	        
-	        var charIndex = this.char.charCodeAt(0) - 32;
-	        var charWidth = 0.03125 * 2;
-	        var NUM_SPRITES = 16;
-	        var uVal = (charIndex % NUM_SPRITES);
-	        var vVal = Math.floor(charIndex / NUM_SPRITES);
-	        
-	        var tex = [
-	                // Mapping coordinates for the vertices
-	                (uVal + 1) * charWidth, vVal * charWidth, 
-	                (uVal) * charWidth, vVal * charWidth,
-	                (uVal + 1) * charWidth, (vVal + 1) * charWidth, 
-	                uVal * charWidth, (vVal + 1) * charWidth, 
-	        ];
-	        
-	        
 	        gl.enableVertexAttribArray(program.texLoc);
 	        gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
-	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tex), gl.STATIC_DRAW);
+	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.getTextureUV()), gl.STATIC_DRAW);
 	        gl.vertexAttribPointer(program.texLoc, 2, gl.FLOAT, false, 0, 0);
-	        gl.uniform1f(program.isText_location, this.isText ? 0.0 : 1.0);
+	        gl.uniform1f(program.isText_location, this.texture.enabled ? 0.0 : 1.0);
 	        gl.uniform1i(program.sampler_location, 0);
 	        
 	        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -167,6 +157,23 @@ Square = function(){
 	        gl.disableVertexAttribArray(program.tecLoc);
 		},
 		tick: function(theta){
+		},
+		
+		getTextureUV : function(){
+			
+			if(!this.texture.enabled) return [0,0,0,0,0,0,0,0];
+			
+
+	        var charWidth = [0.0625*this.texture.size[0], 0.0625*this.texture.size[1]];
+	        var u = this.texture.sprite[0]/this.texture.size[0];
+	        var v = this.texture.sprite[1]/this.texture.size[1];
+	        return tex = [
+	                // Mapping coordinates for the vertices
+	                (u + 1) * charWidth[0],  v * charWidth[1], 
+	                 u      * charWidth[0],  v * charWidth[1],
+	                (u + 1) * charWidth[0], (v + 1) * charWidth[1], 
+	                 u      * charWidth[0], (v + 1) * charWidth[1], 
+	        ];
 		}
 		
 	};
