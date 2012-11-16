@@ -4,7 +4,7 @@ var game = {
 		this.bg = Background();
 		this.player = Player();
 		this.objects = [];
-		for(var i=0; i < 50; i++){
+		for(var i=0; i < 25; i++){
 			this.objects.push(Object());
 		}
 		this.smooth = 0;
@@ -53,7 +53,7 @@ var game = {
         
         var ratio = Main.WIDTH / Main.HEIGHT;
         var model_projection = mat4.lookAt([0,0,-3], [0,0,0], [0,1,0]);
-        var model_view_projection = mat4.frustum(-ratio, ratio, -1, 1, 2, 7);
+        var model_view_projection = mat4.frustum(-ratio, ratio, -1, 1, 2, 6);
         model_projection = mat4.rotate(model_projection, this.smooth*-0.1, [0,1,0]);
         var projection = mat4.multiply(model_view_projection, model_projection);
         
@@ -63,7 +63,7 @@ var game = {
         
         // DRAW SQUARE:
         
-        this.bg.draw(gl);
+        
 
        
         this.objects.sort(function(a,b){
@@ -73,6 +73,7 @@ var game = {
         	this.objects[i].draw(gl);
         }
         this.player.draw(gl);
+        this.bg.draw(gl);
 //        // Draw actual stuff:
 //        bg.bgSquare.z = 0.1f;
 //         bg.draw(gl);

@@ -2,8 +2,8 @@ Object = function(){
 	var object = new Square();
 	object.color = [1,0,0,1];
 	object.size  = [0.1,0.1,0];
-	object.position = [Math.random()*game.bg.size[0]*2-game.bg.size[0], -1*game.bg.size[1], Math.random()/100];
-	object.collissionModifier = 0.5;
+	object.position = [Math.random()*game.bg.size[0]*2-game.bg.size[0]-object.size[0], -1*game.bg.size[1], Math.random()/100];
+	object.collissionModifier = 1;
 	
 	return {
 		velocity : [0,Math.random(),0],
@@ -36,17 +36,18 @@ Object = function(){
 
 Player = function(){
 	var player = new Square();
-	player.color = [1,1,0,1];
-	player.size  = [0.1, 0.2, 1];
+	player.color = [0,0,0,1];
+	player.size  = [0.2, 0.2, 1];
+	player.position = [0, 0.9, 0];
 	player.texture.enabled = true;
-	player.texture.sprite = [4,2];
-	player.texture.size = [2,3];
+	player.texture.sprite = [0,6];
+	player.texture.size = [4,4];
 	return {
 		speed : [0,0,0],
 		direction : [0,0,0],
 		position : player.position,
 		size : player.size,
-		collissionModifier : 0.4,
+		collissionModifier : 0.6,
 		tick : function(theta){
 			this.speed[0] += theta*2;
 			this.speed[1] += theta*2;
@@ -79,9 +80,17 @@ Player = function(){
 Background = function(){
 	
 	var bg = new Square();
-	bg.size = [1.72, 1.40, 1];
-	bg.color = [0.2, 0.2, 0.2, 1.0];
+	bg.size = [1.6, 1.4, 1];
+	bg.color = [1, 1, 1, 1.0];
 	bg.position = [0,0,0.01];
+	
+	var top = new Square();
+	top.size = [1.65, 1.65/8, 1];
+	top.color = [0,0,0,1.0];
+	top.position = [0, 1.30, 0.000];
+	top.texture.enabled = true;
+	top.texture.sprite = [0,14];
+	top.texture.size = [16,2];
 	
 	return{
 		size : bg.size,
@@ -90,6 +99,7 @@ Background = function(){
 		},
 		draw : function(gl){
 			bg.draw(gl);
+			top.draw(gl);
 		}
 	};
 };
