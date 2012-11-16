@@ -4,7 +4,7 @@ var game = {
 		this.bg = Background();
 		this.player = Player();
 		this.objects = [];
-		for(var i=0; i < 25; i++){
+		for(var i=0; i < 10; i++){
 			this.objects.push(Object());
 		}
 		this.smooth = 0;

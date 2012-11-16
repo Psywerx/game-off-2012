@@ -1,9 +1,12 @@
 Object = function(){
 	var object = new Square();
-	object.color = [1,0,0,1];
-	object.size  = [0.1,0.1,0];
+	object.color = [0,0,0,1];
+	object.size  = [0.2,0.2/3,0];
 	object.position = [Math.random()*game.bg.size[0]*2-game.bg.size[0]-object.size[0], -1*game.bg.size[1], Math.random()/100];
 	object.collissionModifier = 1;
+	object.texture.enabled = true;
+	object.texture.sprite = [0,10];
+	object.texture.size = [3,1];
 	
 	return {
 		velocity : [0,Math.random(),0],
@@ -18,14 +21,14 @@ Object = function(){
 				
 				if(object.position[0] + object.size[0]*object.collissionModifier > game.player.position[0] - game.player.size[0] * game.player.collissionModifier &&
 						object.position[0] - object.size[0]*object.collissionModifier < game.player.position[0] + game .player.size[0] * game.player.collissionModifier ){
-					object.color = [0,0,1,1];
+					//object.color = [0,0,1,1];
 				}
 				else{
-					object.color = [0,1,1,1];
+					//object.color = [0,1,1,1];
 				}
 			}
 			else{
-				object.color = [1,0,0,1];
+				//object.color = [1,0,0,1];
 			}
 		},
 		draw : function(gl){
