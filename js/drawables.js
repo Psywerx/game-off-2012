@@ -3,9 +3,12 @@ Object = function(){
 	object.color = [1,0,0,1];
 	object.size  = [0.1,0.1,0];
 	object.position = [Math.random()*game.bg.size[0]*2-game.bg.size[0], -1*game.bg.size[1], Math.random()/100];
+	object.char = 'A';
+	object.isText = true;
 	
 	return {
 		velocity : [0,Math.random(),0],
+		position : object.position,
 		tick : function(theta){
 			object.position[1] += theta * this.velocity[1];
 			if(object.position[1] > game.bg.size[1])
@@ -37,6 +40,8 @@ Player = function(){
 	var player = new Square();
 	player.color = [1,1,0,1];
 	player.size  = [0.1, 0.1, 1];
+	player.char = 'B';
+	player.isText = true;
 	return {
 		speed : [0,0,0],
 		direction : [0,0,0],

@@ -7,7 +7,6 @@ var game = {
 		for(var i=0; i < 50; i++){
 			this.objects.push(Object());
 		}
-		this.objectsSpawner = 2;
 		this.smooth = 0;
 		this.timeline = 0;
 	},
@@ -65,10 +64,15 @@ var game = {
         // DRAW SQUARE:
         
         this.bg.draw(gl);
-        this.player.draw(gl);
+
+       
+        this.objects.sort(function(a,b){
+        	return b.position[2] - a.position[2]; 
+        });
         for(var i=0; i < this.objects.length; i++){
         	this.objects[i].draw(gl);
         }
+        this.player.draw(gl);
 //        // Draw actual stuff:
 //        bg.bgSquare.z = 0.1f;
 //         bg.draw(gl);
