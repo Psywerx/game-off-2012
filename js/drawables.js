@@ -163,7 +163,7 @@ Player = function(){
 	forkObject.size  = [0.2, 0.2, 1];
 	forkObject.position = [0, 0.9, -0.00001];
 	forkObject.texture.enabled = true;
-	forkObject.texture.sprite = [0,6];
+	forkObject.texture.sprite = [4,6];
 	forkObject.collissionModifier = 0.6,
 	forkObject.texture.size = [4,4];
 	
