@@ -5,12 +5,18 @@ var game = {
 		this.player = Player();
 		this.objects = [];
 		for(var i=0; i < 20; i++){
-			this.objects.push(Object());
+			var o = Object();
+			
+			// right edge: -1.7+o.object.size[0]
+			// left  edge:  1.7-o.object.size[0]
+			o.position[0] = 1.7-o.object.size[0] - i*o.object.size[0]*2;
+			this.objects.push(o);
 		}
 		this.smooth = 0;
 		this.scoreBoard = Score();
 		this.score = 0;
 		this.death = false;
+		 
 		
 	},
 	keydown : function(event){
@@ -40,12 +46,7 @@ var game = {
 		this.death = true;
 	},
 	restart : function(){
-		this.score = 0;
-		this.objects = [];
-		for(var i=0; i < 10; i++){
-			this.objects.push(Object());
-		}
-		this.death = false;
+		this.init();
 	},
 	tick : function(theta){
 		if(this.death) return;

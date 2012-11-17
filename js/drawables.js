@@ -56,24 +56,24 @@ Object = function(){
 //	            		   game.score += 5;
 //	            	   }
 //	               },{ 
-	            	   name: "star",
-	            	   size: [0.1,0.1/2,0],
-	            	   textureSprite : [4,11],
-	            	   textureSize : [2,1],
-	            	   collissionModifier : 0.8,
-	            	   collission : function(){
-	            		   object.position = [object.position[0], -2, object.position[2]];
-	            		   game.score += 5;
-	            		   if(!game.player.small){
-	            			   game.player.small = true;
-		            		   game.player.size = [0.1, 0.1, 0];
-		            		   setTimeout(function(){
-		            			   game.player.small = false;
-		            			   game.player.size = [0.2, 0.2, 0];
-		            		   }, 3000);
-	            		   }
-	            	   }
-	               },{ 
+//	            	   name: "star",
+//	            	   size: [0.1,0.1/2,0],
+//	            	   textureSprite : [4,11],
+//	            	   textureSize : [2,1],
+//	            	   collissionModifier : 0.8,
+//	            	   collission : function(){
+//	            		   object.position = [object.position[0], -2, object.position[2]];
+//	            		   game.score += 5;
+//	            		   if(!game.player.small){
+//	            			   game.player.small = true;
+//		            		   game.player.size = [0.1, 0.1, 0];
+//		            		   setTimeout(function(){
+//		            			   game.player.small = false;
+//		            			   game.player.size = [0.2, 0.2, 0];
+//		            		   }, 3000);
+//	            		   }
+//	            	   }
+//	               },{ 
 	            	   name: "fork",
 	            	   size: [0.1,0.1/2,0],
 	            	   textureSprite : [6,11],
@@ -89,22 +89,22 @@ Object = function(){
 		            		   game.player.fork = true;
 	            		   }
 	            	   }
-	               
-	               }, {
-	            	   name: "issue",
-	            	   size: [0.2,0.2/3,0],
-	            	   textureSprite : [0,10],
-	            	   textureSize : [3,1],
-	            	   collissionModifier : 0.8,
-	            	   collission : function(){
-	            		   //object.position = [object.position[0], -2, object.position[2]];
-	            		   game.die();
-	            	   }
 	               }
+//	               }, {
+//	            	   name: "issue",
+//	            	   size: [0.2,0.2/3,0],
+//	            	   textureSprite : [0,10],
+//	            	   textureSize : [3,1],
+//	            	   collissionModifier : 0.8,
+//	            	   collission : function(){
+//	            		   //object.position = [object.position[0], -2, object.position[2]];
+//	            		   game.die();
+//	            	   }
+//	               }
 	               ];
 	var object = new Square();
 	object.color = [0,0,0,1];
-	object.position = [Math.random()*game.bg.size[0]*2-game.bg.size[0]-object.size[0], -1*game.bg.size[1], Math.random()/100];
+	object.position = [0, -1*game.bg.size[1], Math.random()/100];
 	object.collissionModifier = 0.8;
 	object.texture.enabled = true;
 
@@ -113,9 +113,9 @@ Object = function(){
 	object.texture.sprite = type.textureSprite;
 	object.texture.size = type.textureSize;
 	object.type  = type;
-	this.object = object;
 	return {
-		velocity : [0,Math.random(),0],
+		object : object,
+		velocity : [0,0.5,0],
 		position : object.position,
 		tick : function(theta){
 			object.position[1] += theta * this.velocity[1];
@@ -187,27 +187,37 @@ Player = function(){
 				this.speed[1] = 0;
 			}
 			player.position[0] += (this.direction[0] + this.direction[1]) * theta * 2 * (this.speed[0]+this.speed[1]);
-			//player.rotateAngle = this.direction[0]*0.0001;
-			if (player.position[0] < -1*(game.bg.size[0]-player.size[0])) {
-	            player.position[0] = -1*(game.bg.size[0]-player.size[0]);
-	            this.speed[0] = 0;
-	        }
-	        if (player.position[0] > (game.bg.size[0]-player.size[0])) {
-	            player.position[0] = (game.bg.size[0]-player.size[0]);
-	            this.speed[0] = 0;
-	        }
-	        this.position = player.position;
-	        player.size = _.map(this.size, function(s,i){return s * 0.2 + player.size[i] * 0.8;}, this);
-	        forkObject.size = player.size;
-	        forkObject.position = player.position.slice();
-	        forkObject.position[2] = -0.001;
-	        forkObject.position[0] += 1.45*player.size[0];
+			this.position = player.position;
+			player.size = _.map(this.size, function(s,i){return s * 0.2 + player.size[i] * 0.8;}, this);
+			forkObject.size = player.size;
+			forkObject.position = player.position.slice();
+			forkObject.position[2] = -0.001;
+			forkObject.position[0] += 1.45*player.size[0];
 			if(this.fork){
 				forkObject.color[3] = 0.2 + forkObject.color[3]*0.8;
 			}
 			else{
 				forkObject.color[3] = forkObject.color[3]*0.8;
 			}
+			//player.rotateAngle = this.direction[0]*0.0001;
+			if (player.position[0] < -1*(game.bg.size[0]-player.size[0])) {
+	            player.position[0] = -1*(game.bg.size[0]-player.size[0]);
+	            forkObject.position[0] = player.position[0] + 1.45*player.size[0];
+	            this.speed[0] = 0;
+	        }
+			if(!game.player.fork){
+		        if (player.position[0] > (game.bg.size[0]-player.size[0])) {
+		            player.position[0] = (game.bg.size[0]-player.size[0]);
+		            this.speed[0] = 0;
+		        }
+			}
+		    else{
+		    	if (forkObject.position[0] > (game.bg.size[0]-player.size[0])) {
+		    		forkObject.position[0] = (game.bg.size[0]-player.size[0]);
+		    		player.position[0] = forkObject.position[0] - 1.45*player.size[0];
+		            this.speed[0] = 0;
+		        }
+		    }
 		},
 		draw : function(gl){
 			player.draw(gl);
@@ -219,7 +229,7 @@ Player = function(){
 Background = function(){
 	
 	var bg = new Square();
-	bg.size = [1.6, 1.4, 1];
+	bg.size = [1.7, 1.7, 1];
 	bg.color = [1, 1, 1, 1.0];
 	bg.position = [0,0,0.01];
 	
