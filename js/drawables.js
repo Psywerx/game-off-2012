@@ -1,14 +1,14 @@
 Score = function(){
 	
 	var squares = [];
-	var num_numbers = 12;
+	var num_numbers = 14;
 	for(var i = 0; i < num_numbers; i++){
 		var s = new Square();
 		s.texture.enabled = true;
 		s.texture.fromChar("0");
-		s.color = [0.2,0.2,0.2,1];
-		s.size  = [0.05,0.05,0];
-		s.position = [-i/10+0.7, 1.35, -0.01];
+		s.color = [0.3,0.3,0.3,1];
+		s.size  = [0.075,0.075,0];
+		s.position = [-i/10+0.27, 1.33, -0.01];
 		squares.push(s);
 	}
 	
@@ -125,12 +125,12 @@ Background = function(){
 	bg.position = [0,0,0.01];
 	
 	var top = new Square();
-	top.size = [1.65, 1.65/8, 1];
+	top.size = [1.7, 1.7/8.3, 1];
 	top.color = [0,0,0,1.0];
-	top.position = [0, 1.30, 0.000];
+	top.position = [0, 1.34, 0.000];
 	top.texture.enabled = true;
 	top.texture.sprite = [0,14];
-	top.texture.size = [16,2];
+	top.texture.size = [25,3];
 	
 	return{
 		size : bg.size,
@@ -214,7 +214,7 @@ Square = function(){
 			if(!this.texture.enabled) return [0,0,0,0,0,0,0,0];
 			
 
-	        var charWidth = [0.0625*this.texture.size[0], 0.0625*this.texture.size[1]];
+	        var charWidth = [0.03125*this.texture.size[0], 0.03125*this.texture.size[1]];
 	        var u = this.texture.sprite[0]/this.texture.size[0];
 	        var v = this.texture.sprite[1]/this.texture.size[1];
 	        return tex = [
