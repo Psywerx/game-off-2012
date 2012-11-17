@@ -1,20 +1,56 @@
+Score = function(){
+	
+	var squares = [];
+	var num_numbers = 12;
+	for(var i = 0; i < num_numbers; i++){
+		var s = new Square();
+		s.texture.enabled = true;
+		s.texture.fromChar("0");
+		s.color = [0.2,0.2,0.2,1];
+		s.size  = [0.05,0.05,0];
+		s.position = [-i/10+0.7, 1.35, -0.01];
+		squares.push(s);
+	}
+	
+	return {
+		
+		tick : function(theta){
+			var score = game.score + "";
+			while(score.length < num_numbers){
+				score = "0" + score;
+			}
+			
+			for(var i = 0; i < num_numbers; i++){
+				squares[i].texture.fromChar(score.charAt(i));
+			}
+		},
+		draw : function(gl){
+			for(var i = 0; i < num_numbers; i++){
+				squares[i].draw(gl);
+			}
+		}
+	};
+};
+
 Object = function(){
 	var object = new Square();
 	object.color = [0,0,0,1];
 	object.size  = [0.2,0.2/3,0];
 	object.position = [Math.random()*game.bg.size[0]*2-game.bg.size[0]-object.size[0], -1*game.bg.size[1], Math.random()/100];
-	object.collissionModifier = 1;
+	object.collissionModifier = 0.8;
 	object.texture.enabled = true;
 	object.texture.sprite = [0,10];
 	object.texture.size = [3,1];
-	
+	this.object = object;
 	return {
 		velocity : [0,Math.random(),0],
 		position : object.position,
 		tick : function(theta){
 			object.position[1] += theta * this.velocity[1];
-			if(object.position[1] > game.bg.size[1])
+			if(object.position[1] > game.bg.size[1]){
 				object.position[1] = -1*game.bg.size[1];
+				game.score += 1;
+			}
 			
 			if(object.position[1] + object.size[1]*object.collissionModifier > game.player.position[1] - game.player.size[1] * game.player.collissionModifier &&
 					object.position[1] - object.size[1]*object.collissionModifier < game.player.position[1] + game .player.size[1] * game.player.collissionModifier ){
@@ -22,6 +58,7 @@ Object = function(){
 				if(object.position[0] + object.size[0]*object.collissionModifier > game.player.position[0] - game.player.size[0] * game.player.collissionModifier &&
 						object.position[0] - object.size[0]*object.collissionModifier < game.player.position[0] + game .player.size[0] * game.player.collissionModifier ){
 					//object.color = [0,0,1,1];
+					game.die();
 				}
 				else{
 					//object.color = [0,1,1,1];

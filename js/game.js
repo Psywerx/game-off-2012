@@ -4,11 +4,14 @@ var game = {
 		this.bg = Background();
 		this.player = Player();
 		this.objects = [];
-		for(var i=0; i < 10; i++){
+		for(var i=0; i < 20; i++){
 			this.objects.push(Object());
 		}
 		this.smooth = 0;
-		this.timeline = 0;
+		this.scoreBoard = Score();
+		this.score = 0;
+		this.death = false;
+		
 	},
 	keydown : function(event){
 		switch (event.keyCode) {
@@ -18,7 +21,10 @@ var game = {
         case KeyEvent.VK_RIGHT:
         	game.player.direction[1] = -1;
             break;
-        }
+		case KeyEvent.VK_SPACE:
+			game.restart();
+			break;
+		}
 	},
 	keyup : function(event){
 		switch (event.keyCode) {
@@ -30,7 +36,19 @@ var game = {
             break;
         }
 	},
+	die : function(){
+		this.death = true;
+	},
+	restart : function(){
+		this.score = 0;
+		this.objects = [];
+		for(var i=0; i < 10; i++){
+			this.objects.push(Object());
+		}
+		this.death = false;
+	},
 	tick : function(theta){
+		if(this.death) return;
 		this.timeline += theta;
 		this.bg.tick(theta);
 		this.player.tick(theta);
@@ -38,6 +56,7 @@ var game = {
 		for(var i=0; i < this.objects.length; i++){
 			this.objects[i].tick(theta);
         }
+		this.scoreBoard.tick(theta);
 	},
 	draw : function(gl){
 		
@@ -74,6 +93,7 @@ var game = {
         }
         this.player.draw(gl);
         this.bg.draw(gl);
+        this.scoreBoard.draw(gl);
 //        // Draw actual stuff:
 //        bg.bgSquare.z = 0.1f;
 //         bg.draw(gl);
