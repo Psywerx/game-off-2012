@@ -33,14 +33,75 @@ Score = function(){
 };
 
 Object = function(){
+	var ObjectTypes = [
+	               { 
+	            	   name: "pull",
+	            	   size: [0.1,0.1/2,0],
+	            	   textureSprite : [0,11],
+	            	   textureSize : [2,1],
+	            	   collissionModifier : 0.8,
+	            	   collission : function(){
+	            		   object.position = [object.position[0], -2, object.position[2]];
+	            		   game.score += 10;
+	            	   }
+	               
+	               },{ 
+	            	   name: "watch",
+	            	   size: [0.1,0.1/2,0],
+	            	   textureSprite : [2,11],
+	            	   textureSize : [2,1],
+	            	   collissionModifier : 0.8,
+	            	   collission : function(){
+	            		   object.position = [object.position[0], -2, object.position[2]];
+	            		   game.score += 3;
+	            	   }
+	               },{ 
+	            	   name: "star",
+	            	   size: [0.1,0.1/2,0],
+	            	   textureSprite : [4,11],
+	            	   textureSize : [2,1],
+	            	   collissionModifier : 0.8,
+	            	   collission : function(){
+	            		   object.position = [object.position[0], -2, object.position[2]];
+	            		   game.player.size = [0.1, 0.1, 0];
+	            		   setTimeout(function(){
+	            			   game.player.size = [0.2, 0.2, 0];
+	            		   }, 3000);
+	            	   }
+	               },{ 
+	            	   name: "fork",
+	            	   size: [0.1,0.1/2,0],
+	            	   textureSprite : [6,11],
+	            	   textureSize : [2,1],
+	            	   collissionModifier : 0.8,
+	            	   collission : function(){
+	            		   object.position = [object.position[0], -2, object.position[2]];
+	            		   game.score += 20;
+	            	   }
+	               
+	               }, {
+	            	   name: "issue",
+	            	   size: [0.2,0.2/3,0],
+	            	   textureSprite : [0,10],
+	            	   textureSize : [3,1],
+	            	   collissionModifier : 0.8,
+	            	   collission : function(){
+	            		   //object.position = [object.position[0], -2, object.position[2]];
+	            		   game.die();
+	            	   }
+	               }
+	               ];
 	var object = new Square();
 	object.color = [0,0,0,1];
-	object.size  = [0.2,0.2/3,0];
 	object.position = [Math.random()*game.bg.size[0]*2-game.bg.size[0]-object.size[0], -1*game.bg.size[1], Math.random()/100];
 	object.collissionModifier = 0.8;
 	object.texture.enabled = true;
-	object.texture.sprite = [0,10];
-	object.texture.size = [3,1];
+
+	var type = ObjectTypes[Math.floor(Math.random()*10)%ObjectTypes.length];
+	object.size  = type.size;
+	object.texture.sprite = type.textureSprite;
+	object.texture.size = type.textureSize;
+	object.type  = type;
 	this.object = object;
 	return {
 		velocity : [0,Math.random(),0],
@@ -57,15 +118,12 @@ Object = function(){
 				
 				if(object.position[0] + object.size[0]*object.collissionModifier > game.player.position[0] - game.player.size[0] * game.player.collissionModifier &&
 						object.position[0] - object.size[0]*object.collissionModifier < game.player.position[0] + game .player.size[0] * game.player.collissionModifier ){
-					//object.color = [0,0,1,1];
-					game.die();
+					object.type.collission();
 				}
 				else{
-					//object.color = [0,1,1,1];
 				}
 			}
 			else{
-				//object.color = [1,0,0,1];
 			}
 		},
 		draw : function(gl){
@@ -108,7 +166,7 @@ Player = function(){
 	            this.speed[0] = 0;
 	        }
 	        this.position = player.position;
-	        player.size = this.size;
+	        player.size = _.map(this.size, function(s,i){return s * 0.2 + player.size[i] * 0.8;}, this);
 			
 		},
 		draw : function(gl){
