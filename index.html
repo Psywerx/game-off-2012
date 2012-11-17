@@ -26,7 +26,7 @@ uniform float u_isText;
 void main (void) { 
   if(u_isText < 0.5){
     vec4 texture = texture2D(s_texture, v_texCoord.st); 
-    gl_FragColor = texture + (texture.w * varying_Color); 
+    gl_FragColor = texture * varying_Color[3]; 
   } else { 
     gl_FragColor = varying_Color; 
   }

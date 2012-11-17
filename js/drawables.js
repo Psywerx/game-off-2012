@@ -35,27 +35,27 @@ Score = function(){
 Object = function(){
 	var ObjectTypes = [
 	               { 
-	            	   name: "pull",
-	            	   size: [0.1,0.1/2,0],
-	            	   textureSprite : [0,11],
-	            	   textureSize : [2,1],
-	            	   collissionModifier : 0.8,
-	            	   collission : function(){
-	            		   object.position = [object.position[0], -2, object.position[2]];
-	            		   game.score += 10;
-	            	   }
-	               
-	               },{ 
-	            	   name: "watch",
-	            	   size: [0.1,0.1/2,0],
-	            	   textureSprite : [2,11],
-	            	   textureSize : [2,1],
-	            	   collissionModifier : 0.8,
-	            	   collission : function(){
-	            		   object.position = [object.position[0], -2, object.position[2]];
-	            		   game.score += 3;
-	            	   }
-	               },{ 
+//	            	   name: "pull",
+//	            	   size: [0.1,0.1/2,0],
+//	            	   textureSprite : [0,11],
+//	            	   textureSize : [2,1],
+//	            	   collissionModifier : 0.8,
+//	            	   collission : function(){
+//	            		   object.position = [object.position[0], -2, object.position[2]];
+//	            		   game.score += 5;
+//	            	   }
+//	               
+//	               },{ 
+//	            	   name: "watch",
+//	            	   size: [0.1,0.1/2,0],
+//	            	   textureSprite : [2,11],
+//	            	   textureSize : [2,1],
+//	            	   collissionModifier : 0.8,
+//	            	   collission : function(){
+//	            		   object.position = [object.position[0], -2, object.position[2]];
+//	            		   game.score += 5;
+//	            	   }
+//	               },{ 
 	            	   name: "star",
 	            	   size: [0.1,0.1/2,0],
 	            	   textureSprite : [4,11],
@@ -63,10 +63,15 @@ Object = function(){
 	            	   collissionModifier : 0.8,
 	            	   collission : function(){
 	            		   object.position = [object.position[0], -2, object.position[2]];
-	            		   game.player.size = [0.1, 0.1, 0];
-	            		   setTimeout(function(){
-	            			   game.player.size = [0.2, 0.2, 0];
-	            		   }, 3000);
+	            		   game.score += 5;
+	            		   if(!game.player.small){
+	            			   game.player.small = true;
+		            		   game.player.size = [0.1, 0.1, 0];
+		            		   setTimeout(function(){
+		            			   game.player.small = false;
+		            			   game.player.size = [0.2, 0.2, 0];
+		            		   }, 3000);
+	            		   }
 	            	   }
 	               },{ 
 	            	   name: "fork",
@@ -76,7 +81,13 @@ Object = function(){
 	            	   collissionModifier : 0.8,
 	            	   collission : function(){
 	            		   object.position = [object.position[0], -2, object.position[2]];
-	            		   game.score += 20;
+	            		   game.score += 5;
+	            		   if(!game.player.fork){
+		            		   setTimeout(function(){
+		            			   game.player.fork = false;
+		            		   }, 3000);
+		            		   game.player.fork = true;
+	            		   }
 	            	   }
 	               
 	               }, {
@@ -112,10 +123,15 @@ Object = function(){
 				object.position[1] = -1*game.bg.size[1];
 				game.score += 1;
 			}
-			
 			if(object.position[1] + object.size[1]*object.collissionModifier > game.player.position[1] - game.player.size[1] * game.player.collissionModifier &&
-					object.position[1] - object.size[1]*object.collissionModifier < game.player.position[1] + game .player.size[1] * game.player.collissionModifier ){
-				
+					object.position[1] - object.size[1]*object.collissionModifier < game.player.position[1] + game.player.size[1] * game.player.collissionModifier ){
+				if(game.player.fork)
+					if(object.position[0] + object.size[0]*object.collissionModifier > game.player.forkObject.position[0] - game.player.forkObject.size[0] * game.player.forkObject.collissionModifier &&
+							object.position[0] - object.size[0]*object.collissionModifier < game.player.forkObject.position[0] + game.player.forkObject.size[0] * game.player.forkObject.collissionModifier ){
+						object.type.collission();
+					}
+					else{
+					}
 				if(object.position[0] + object.size[0]*object.collissionModifier > game.player.position[0] - game.player.size[0] * game.player.collissionModifier &&
 						object.position[0] - object.size[0]*object.collissionModifier < game.player.position[0] + game .player.size[0] * game.player.collissionModifier ){
 					object.type.collission();
@@ -140,12 +156,27 @@ Player = function(){
 	player.texture.enabled = true;
 	player.texture.sprite = [0,6];
 	player.texture.size = [4,4];
+	
+	
+	var forkObject = new Square();
+	forkObject.color = [1,1,1,0];
+	forkObject.size  = [0.2, 0.2, 1];
+	forkObject.position = [0, 0.9, -0.00001];
+	forkObject.texture.enabled = true;
+	forkObject.texture.sprite = [0,6];
+	forkObject.collissionModifier = 0.6,
+	forkObject.texture.size = [4,4];
+	
+	
 	return {
 		speed : [0,0,0],
 		direction : [0,0,0],
 		position : player.position,
 		size : player.size,
 		collissionModifier : 0.6,
+		forkObject : forkObject,
+		fork : false,
+		small : false,
 		tick : function(theta){
 			this.speed[0] += theta*2;
 			this.speed[1] += theta*2;
@@ -167,10 +198,20 @@ Player = function(){
 	        }
 	        this.position = player.position;
 	        player.size = _.map(this.size, function(s,i){return s * 0.2 + player.size[i] * 0.8;}, this);
-			
+	        forkObject.size = player.size;
+	        forkObject.position = player.position.slice();
+	        forkObject.position[2] = -0.001;
+	        forkObject.position[0] += 1.45*player.size[0];
+			if(this.fork){
+				forkObject.color[3] = 0.2 + forkObject.color[3]*0.8;
+			}
+			else{
+				forkObject.color[3] = forkObject.color[3]*0.8;
+			}
 		},
 		draw : function(gl){
 			player.draw(gl);
+			forkObject.draw(gl);
 		}
 	};
 };
