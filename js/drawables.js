@@ -123,24 +123,11 @@ Object = function(){
 				object.position[1] = -1*game.bg.size[1];
 				game.score += 1;
 			}
-			if(object.position[1] + object.size[1]*object.collissionModifier > game.player.position[1] - game.player.size[1] * game.player.collissionModifier &&
-					object.position[1] - object.size[1]*object.collissionModifier < game.player.position[1] + game.player.size[1] * game.player.collissionModifier ){
-				if(game.player.fork)
-					if(object.position[0] + object.size[0]*object.collissionModifier > game.player.forkObject.position[0] - game.player.forkObject.size[0] * game.player.forkObject.collissionModifier &&
-							object.position[0] - object.size[0]*object.collissionModifier < game.player.forkObject.position[0] + game.player.forkObject.size[0] * game.player.forkObject.collissionModifier ){
-						object.type.collission();
-					}
-					else{
-					}
-				if(object.position[0] + object.size[0]*object.collissionModifier > game.player.position[0] - game.player.size[0] * game.player.collissionModifier &&
-						object.position[0] - object.size[0]*object.collissionModifier < game.player.position[0] + game .player.size[0] * game.player.collissionModifier ){
-					object.type.collission();
-				}
-				else{
-				}
-			}
-			else{
-			}
+			if(game.areColliding(object, game.player))
+				object.type.collission();
+			
+			if(game.player.fork && game.areColliding(object, game.player.forkObject))
+				object.type.collission();
 		},
 		draw : function(gl){
 			object.draw(gl);

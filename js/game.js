@@ -48,6 +48,14 @@ var game = {
 	restart : function(){
 		this.init();
 	},
+	areColliding : function(a, b){
+		for (var i=1; i>=0; i--)
+			if(a.position[i] + a.size[i]*a.collissionModifier < b.position[i] - b.size[i] * b.collissionModifier ||
+			   a.position[i] - a.size[i]*a.collissionModifier >  b.position[i] + b.size[i] * b.collissionModifier)
+				return false;
+		return true;
+		
+	},
 	tick : function(theta){
 		if(this.death) return;
 		this.timeline += theta;
@@ -82,10 +90,6 @@ var game = {
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         
         // DRAW SQUARE:
-        
-        
-
-       
         this.objects.sort(function(a,b){
         	return b.position[2] - a.position[2]; 
         });
@@ -95,14 +99,5 @@ var game = {
         this.player.draw(gl);
         this.bg.draw(gl);
         this.scoreBoard.draw(gl);
-//        // Draw actual stuff:
-//        bg.bgSquare.z = 0.1f;
-//         bg.draw(gl);
-//         title.draw(gl);
-//         scoreText.draw(gl);
-//        for (Obstacle g : objects) {
-//            g.draw(gl);
-//        }
-//        player.draw(gl);
 	}
 };
