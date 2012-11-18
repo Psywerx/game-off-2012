@@ -5,6 +5,17 @@ Main = {
 		
 		$(document).keydown(game.keydown);
 		$(document).keyup(game.keyup);
+		$(window).focus(function(){
+				if(game.pause){
+					game.pause = false;
+					Main.t0 = Date.now();
+					setTimeout(game.generator, Math.max(200,(game.objectDelay-Math.pow(game.timePlayed,1.2))/(1+game.objectSpeed)));
+				}
+			});
+		$(window).blur(function(){
+			game.pause = true;
+		});
+
 		
 		
 		this.canvas = $("#the-canvas")[0];

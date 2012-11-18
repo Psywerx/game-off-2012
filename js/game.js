@@ -5,8 +5,8 @@ var game = {
 		this.player = Player();
 		this.objects = [];
 		this.idleObjects = [];
-		this.objectSpeed = 0.4;
-		this.objectDelay = 700;
+		this.objectSpeed = 0.8;
+		this.objectDelay = 1600;
 		this.timePlayed = 0;
 		// Generate bonuses:
 		for(var i=0, j=0; i < 17*2; [i++, j++]){
@@ -34,17 +34,18 @@ var game = {
 		this.scoreBoard = Score();
 		this.score = 0;
 		this.death = false;
+		this.pause = false;
 		setTimeout(this.generator, game.objectDelay);
 		
 	},
 	generator : function(){
-		if(game.death) return;
+		if(game.death || game.pause) return;
 		var i = Math.floor(Math.random() * game.idleObjects.length);
 		var o = game.idleObjects[i];
 		game.idleObjects.splice(i, 1); // get random element;
 		o.velocity = [0, game.objectSpeed, 0];
 		game.objects.push(o);
-		game.objectSpeed += game.timePlayed*0.0001;
+		game.objectSpeed += game.timePlayed*0.00001;
 		setTimeout(game.generator, Math.max(200,(game.objectDelay-Math.pow(game.timePlayed,1.2))/(1+game.objectSpeed)));
 	},
 	keydown : function(event){
@@ -85,11 +86,11 @@ var game = {
 		
 	},
 	tick : function(theta){
-		if(this.death) return;
+		this.smooth = 0.8*this.smooth + 0.2*(game.player.direction[0] + game.player.direction[1]);
+		if(this.death || this.pause) return;
 		this.timePlayed += theta;
 		this.bg.tick(theta);
 		this.player.tick(theta);
-		this.smooth = 0.8*this.smooth + 0.2*(game.player.direction[0] + game.player.direction[1]);
 		for(var i=0; i < this.objects.length; i++){
 			this.objects[i].tick(theta);
         }
