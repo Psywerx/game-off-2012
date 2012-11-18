@@ -32,7 +32,7 @@ Score = function(){
 	};
 };
 
-Object = function(){
+Object = function(type){
 	var ObjectTypes = [
 	               { 
 //	            	   name: "pull",
@@ -56,32 +56,32 @@ Object = function(){
 //	            		   game.score += 5;
 //	            	   }
 //	               },{ 
-//	            	   name: "star",
-//	            	   size: [0.1,0.1/2,0],
-//	            	   textureSprite : [4,11],
-//	            	   textureSize : [2,1],
-//	            	   collissionModifier : 0.8,
-//	            	   collission : function(){
-//	            		   object.position = [object.position[0], -2, object.position[2]];
-//	            		   game.score += 5;
-//	            		   if(!game.player.small){
-//	            			   game.player.small = true;
-//		            		   game.player.size = [0.1, 0.1, 0];
-//		            		   setTimeout(function(){
-//		            			   game.player.small = false;
-//		            			   game.player.size = [0.2, 0.2, 0];
-//		            		   }, 3000);
-//	            		   }
-//	            	   }
-//	               },{ 
+	            	   name: "star",
+	            	   size: [0.1,0.1/2,0],
+	            	   textureSprite : [4,11],
+	            	   textureSize : [2,1],
+	            	   collissionModifier : 0.8,
+	            	   collission : function(o){
+	            		   o.makeIdle();
+	            		   game.score += 5;
+	            		   if(!game.player.small){
+	            			   game.player.small = true;
+		            		   game.player.size = [0.1, 0.1, 0];
+		            		   setTimeout(function(){
+		            			   game.player.small = false;
+		            			   game.player.size = [0.2, 0.2, 0];
+		            		   }, 3000);
+	            		   }
+	            	   }
+	               },{ 
 	            	   name: "fork",
 	            	   size: [0.1,0.1/2,0],
 	            	   textureSprite : [6,11],
 	            	   textureSize : [2,1],
 	            	   collissionModifier : 0.8,
-	            	   collission : function(){
-	            		   object.position = [object.position[0], -2, object.position[2]];
+	            	   collission : function(o){
 	            		   game.score += 5;
+	            		   o.makeIdle();
 	            		   if(!game.player.fork){
 		            		   setTimeout(function(){
 		            			   game.player.fork = false;
@@ -89,18 +89,17 @@ Object = function(){
 		            		   game.player.fork = true;
 	            		   }
 	            	   }
+	               }, {
+	            	   name: "issue",
+	            	   size: [0.2,0.2/3,0],
+	            	   textureSprite : [0,10],
+	            	   textureSize : [3,1],
+	            	   collissionModifier : 0.8,
+	            	   collission : function(o){
+	            		   //object.position = [object.position[0], -2, object.position[2]];
+	            		   game.die();
+	            	   }
 	               }
-//	               }, {
-//	            	   name: "issue",
-//	            	   size: [0.2,0.2/3,0],
-//	            	   textureSprite : [0,10],
-//	            	   textureSize : [3,1],
-//	            	   collissionModifier : 0.8,
-//	            	   collission : function(){
-//	            		   //object.position = [object.position[0], -2, object.position[2]];
-//	            		   game.die();
-//	            	   }
-//	               }
 	               ];
 	var object = new Square();
 	object.color = [0,0,0,1];
@@ -108,26 +107,33 @@ Object = function(){
 	object.collissionModifier = 0.8;
 	object.texture.enabled = true;
 
-	var type = ObjectTypes[Math.floor(Math.random()*10)%ObjectTypes.length];
+	var type = ObjectTypes[type != 'B' ? 2 : Math.round(Math.random())];
 	object.size  = type.size;
 	object.texture.sprite = type.textureSprite;
 	object.texture.size = type.textureSize;
 	object.type  = type;
 	return {
 		object : object,
-		velocity : [0,0.5,0],
+		velocity : [0,0,0],
 		position : object.position,
+		makeIdle : function(){
+			game.objects.splice(game.objects.indexOf(this), 1);
+			game.idleObjects.push(this);
+			this.object.velocity = [0,0,0];
+			this.object.position[1] = -1*game.bg.size[1];
+		},
 		tick : function(theta){
 			object.position[1] += theta * this.velocity[1];
 			if(object.position[1] > game.bg.size[1]){
-				object.position[1] = -1*game.bg.size[1];
+				
+				this.makeIdle();
 				game.score += 1;
 			}
 			if(game.areColliding(object, game.player))
-				object.type.collission();
+				object.type.collission(this);
 			
 			if(game.player.fork && game.areColliding(object, game.player.forkObject))
-				object.type.collission();
+				object.type.collission(this);
 		},
 		draw : function(gl){
 			object.draw(gl);
@@ -154,6 +160,9 @@ Player = function(){
 	forkObject.collissionModifier = 0.6,
 	forkObject.texture.size = [4,4];
 	
+	var isWallColliding = function(o){ // d = 1 left wall; d = -1 right wall
+		return o.position[0] < -1*(game.bg.size[0]-o.size[0]) || o.position[0] > (game.bg.size[0]-o.size[0]);
+	};
 	
 	return {
 		speed : [0,0,0],
@@ -173,7 +182,8 @@ Player = function(){
 				this.speed[0] = 0;
 				this.speed[1] = 0;
 			}
-			player.position[0] += (this.direction[0] + this.direction[1]) * theta * 2 * (this.speed[0]+this.speed[1]);
+			var posChange = (this.direction[0] + this.direction[1]) * theta * 2 * (this.speed[0]+this.speed[1]);
+			player.position[0] += posChange;
 			this.position = player.position;
 			player.size = _.map(this.size, function(s,i){return s * 0.2 + player.size[i] * 0.8;}, this);
 			forkObject.size = player.size;
@@ -186,25 +196,17 @@ Player = function(){
 			else{
 				forkObject.color[3] = forkObject.color[3]*0.8;
 			}
-			//player.rotateAngle = this.direction[0]*0.0001;
-			if (player.position[0] < -1*(game.bg.size[0]-player.size[0])) {
-	            player.position[0] = -1*(game.bg.size[0]-player.size[0]);
+			if (isWallColliding(player)) {
+				var collidingWall = player.position[0]/Math.abs(player.position[0]); // -1 left, 1 right
+	            player.position[0]     = collidingWall*(game.bg.size[0]-forkObject.size[0]);
 	            forkObject.position[0] = player.position[0] + 1.45*player.size[0];
 	            this.speed[0] = 0;
 	        }
-			if(!game.player.fork){
-		        if (player.position[0] > (game.bg.size[0]-player.size[0])) {
-		            player.position[0] = (game.bg.size[0]-player.size[0]);
-		            this.speed[0] = 0;
-		        }
+			if(game.player.fork && isWallColliding(forkObject)){
+				forkObject.position[0] = game.bg.size[0]-forkObject.size[0];
+				player.position[0] = forkObject.position[0] - 1.45*player.size[0];
+				this.speed[0] = 0;
 			}
-		    else{
-		    	if (forkObject.position[0] > (game.bg.size[0]-player.size[0])) {
-		    		forkObject.position[0] = (game.bg.size[0]-player.size[0]);
-		    		player.position[0] = forkObject.position[0] - 1.45*player.size[0];
-		            this.speed[0] = 0;
-		        }
-		    }
 		},
 		draw : function(gl){
 			player.draw(gl);

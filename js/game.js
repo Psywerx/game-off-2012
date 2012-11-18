@@ -4,20 +4,48 @@ var game = {
 		this.bg = Background();
 		this.player = Player();
 		this.objects = [];
-		for(var i=0; i < 20; i++){
-			var o = Object();
-			
-			// right edge: -1.7+o.object.size[0]
-			// left  edge:  1.7-o.object.size[0]
-			o.position[0] = 1.7-o.object.size[0] - i*o.object.size[0]*2;
-			this.objects.push(o);
+		this.idleObjects = [];
+		this.objectSpeed = 0.4;
+		this.objectDelay = 700;
+		this.timePlayed = 0;
+		// Generate bonuses:
+		for(var i=0, j=0; i < 17*2; [i++, j++]){
+			var o = Object('B');
+			var position = game.bg.size[0]-o.object.size[0] - j*o.object.size[0]*2;
+			if(Math.abs(position) > game.bg.size[0]){
+				j = 0;
+				position = game.bg.size[0]-o.object.size[0];
+			}
+			o.position[0] = position;
+			this.idleObjects.push(o);
+		}
+		// Generate obstacles:
+		for(var i=0, j=0; i < 7*20; [i++, j++]){
+			var o = Object('O');
+			var position = game.bg.size[0]-o.object.size[0] - j*(0.1+o.object.size[0]*2) ;
+			if(Math.abs(position) > game.bg.size[0]){
+				j = 0;
+				position = game.bg.size[0]-o.object.size[0];
+			}
+			o.position[0] = position;
+			this.idleObjects.push(o);
 		}
 		this.smooth = 0;
 		this.scoreBoard = Score();
 		this.score = 0;
 		this.death = false;
-		 
+		setTimeout(this.generator, game.objectDelay);
 		
+	},
+	generator : function(){
+		if(game.death) return;
+		var i = Math.floor(Math.random() * game.idleObjects.length);
+		var o = game.idleObjects[i];
+		game.idleObjects.splice(i, 1); // get random element;
+		o.velocity = [0, game.objectSpeed, 0];
+		game.objects.push(o);
+		game.objectSpeed += game.timePlayed*0.0001;
+		setTimeout(game.generator, Math.max(200,(game.objectDelay-Math.pow(game.timePlayed,1.2))/(1+game.objectSpeed)));
 	},
 	keydown : function(event){
 		switch (event.keyCode) {
@@ -58,7 +86,7 @@ var game = {
 	},
 	tick : function(theta){
 		if(this.death) return;
-		this.timeline += theta;
+		this.timePlayed += theta;
 		this.bg.tick(theta);
 		this.player.tick(theta);
 		this.smooth = 0.8*this.smooth + 0.2*(game.player.direction[0] + game.player.direction[1]);
