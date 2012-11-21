@@ -35,17 +35,20 @@ Score = function(){
 Object = function(type){
 	var ObjectTypes = [
 	               { 
-//	            	   name: "pull",
-//	            	   size: [0.1,0.1/2,0],
-//	            	   textureSprite : [0,11],
-//	            	   textureSize : [2,1],
-//	            	   collissionModifier : 0.8,
-//	            	   collission : function(){
-//	            		   object.position = [object.position[0], -2, object.position[2]];
-//	            		   game.score += 5;
-//	            	   }
-//	               
-//	               },{ 
+	            	   name: "pull",
+	            	   size: [0.1,0.1/2,0],
+	            	   textureSprite : [0,11],
+	            	   textureSize : [2,1],
+	            	   collissionModifier : 0.8,
+	            	   collission : function(o){
+	            		   console.log(game.objectSpeed);
+	            		   game.objectSpeed -= 0.1;
+	            		   game.objectSpeed = Math.max(0.2, game.objectSpeed);
+	            		   o.makeIdle();
+	            		   game.score += 5;
+	            	   }
+	               
+	               },{ 
 //	            	   name: "watch",
 //	            	   size: [0.1,0.1/2,0],
 //	            	   textureSprite : [2,11],
@@ -107,7 +110,7 @@ Object = function(type){
 	object.collissionModifier = 0.8;
 	object.texture.enabled = true;
 
-	var type = ObjectTypes[type != 'B' ? 2 : Math.round(Math.random())];
+	var type = ObjectTypes[type != 'B' ? 3 : Math.round(Math.random())*2];
 	object.size  = type.size;
 	object.texture.sprite = type.textureSprite;
 	object.texture.size = type.textureSize;
@@ -123,6 +126,7 @@ Object = function(type){
 			this.object.position[1] = -1*game.bg.size[1];
 		},
 		tick : function(theta){
+			this.velocity[1] = game.objectSpeed;
 			object.position[1] += theta * this.velocity[1];
 			if(object.position[1] > game.bg.size[1]){
 				

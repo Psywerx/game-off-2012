@@ -45,7 +45,6 @@ var game = {
 		game.idleObjects.splice(i, 1); // get random element;
 		o.velocity = [0, game.objectSpeed, 0];
 		game.objects.push(o);
-		game.objectSpeed += game.timePlayed*0.00001;
 		setTimeout(game.generator, Math.max(200,(game.objectDelay-Math.pow(game.timePlayed,1.2))/(1+game.objectSpeed)));
 	},
 	keydown : function(event){
@@ -89,6 +88,7 @@ var game = {
 		this.smooth = 0.8*this.smooth + 0.2*(game.player.direction[0] + game.player.direction[1]);
 		if(this.death || this.pause) return;
 		this.timePlayed += theta;
+		game.objectSpeed += this.timePlayed*0.00002;
 		this.bg.tick(theta);
 		this.player.tick(theta);
 		for(var i=0; i < this.objects.length; i++){
