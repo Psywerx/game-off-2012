@@ -32,6 +32,55 @@ Score = function(){
 	};
 };
 
+Point = function(){
+	
+	var program = Main.program;
+	var modelMatrix = mat4.identity();
+	var vertices = [1.0, 1.0, 0.0, -1.0, 1.0, 0.0, 1.0, -1.0, 0.0, -1.0, -1.0, 0.0];
+	var vertBuffer =  gl.createBuffer();
+	var colorBuffer = gl.createBuffer();
+	var texBuffer = gl.createBuffer();
+	var arrayVertices = new Float32Array(vertices);
+	
+	return {
+		position : [0,0,0],
+		color : [0.5, 0, 0, 1],
+		draw: function(gl){
+			modelMatrix = mat4.identity();
+	        gl.uniformMatrix4fv(program.modelMatrix_location, false, modelMatrix);
+	        vertices = [1.0, 1.0, 0.0, -1.0, 1.0, 0.0, 1.0, -1.0, 0.0, -1.0, -1.0, 0.0];
+	        gl.bindBuffer(gl.ARRAY_BUFFER, vertBuffer);
+	        gl.enableVertexAttribArray(program.positionLoc);
+	        vertices = _.map(vertices, function(num,i){return num * 1;}, this);
+	        arrayVertices.set(vertices);
+	        gl.bufferData(gl.ARRAY_BUFFER, arrayVertices, gl.STATIC_DRAW);
+	        gl.vertexAttribPointer(program.positionLoc, 3, gl.FLOAT, false, 0, 0);
+	        var colors = _.flatten([this.color, this.color, this.color, this.color]);
+	        gl.enableVertexAttribArray(program.colorLoc);
+	        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+	        gl.vertexAttribPointer(program.colorLoc, 4, gl.FLOAT, false, 0, 0);
+	        
+	        gl.enableVertexAttribArray(program.texLoc);
+	        gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
+	        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0,0,0,0,0,0,0,0]), gl.STATIC_DRAW);
+	        gl.vertexAttribPointer(program.texLoc, 2, gl.FLOAT, false, 0, 0);
+	        gl.uniform1f(program.isText_location, 1.0);
+	        gl.uniform1i(program.sampler_location, 0);
+	        
+	        gl.drawArrays(gl.POINTS, 0, 4);
+	        
+	        gl.disableVertexAttribArray(program.positionLoc);
+	        gl.disableVertexAttribArray(program.colorLoc);
+	        gl.disableVertexAttribArray(program.tecLoc);
+		},
+		tick: function(delta){
+			
+		}
+	};
+};
+
+
 Object = function(objectType){
 	var ObjectTypes = [
 	               { 

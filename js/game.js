@@ -3,6 +3,7 @@ var game = {
 	init : function(){
 		this.bg = Background();
 		this.player = Player();
+		this.point = Point();
 		this.objects = [];
 		this.idleObjects = [];
 		this.objectSpeed = 0.8;
@@ -118,7 +119,6 @@ var game = {
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         
-        // DRAW SQUARE:
         this.objects.sort(function(a,b){
         	return b.position[2] - a.position[2]; 
         });
@@ -128,5 +128,6 @@ var game = {
         this.player.draw(gl);
         this.bg.draw(gl);
         this.scoreBoard.draw(gl);
+        this.point.draw(gl);
 	}
 };

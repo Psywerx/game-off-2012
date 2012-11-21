@@ -52,6 +52,7 @@ void main(void) {
   varying_Color = attribute_Color; 
   gl_Position = uniform_Projection * uniform_Model * attribute_Position; 
   v_texCoord = a_texCoord; 
+  gl_PointSize = 50.0;
 } 
 </script>
 
