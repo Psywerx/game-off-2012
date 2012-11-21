@@ -32,7 +32,7 @@ Score = function(){
 	};
 };
 
-Object = function(type){
+Object = function(objectType){
 	var ObjectTypes = [
 	               { 
 	            	   name: "pull",
@@ -41,24 +41,32 @@ Object = function(type){
 	            	   textureSize : [2,1],
 	            	   collissionModifier : 0.8,
 	            	   collission : function(o){
-	            		   console.log(game.objectSpeed);
-	            		   game.objectSpeed -= 0.1;
+	            		   game.objectSpeed -= 0.25;
 	            		   game.objectSpeed = Math.max(0.2, game.objectSpeed);
 	            		   o.makeIdle();
 	            		   game.score += 5;
 	            	   }
 	               
 	               },{ 
-//	            	   name: "watch",
-//	            	   size: [0.1,0.1/2,0],
-//	            	   textureSprite : [2,11],
-//	            	   textureSize : [2,1],
-//	            	   collissionModifier : 0.8,
-//	            	   collission : function(){
-//	            		   object.position = [object.position[0], -2, object.position[2]];
-//	            		   game.score += 5;
-//	            	   }
-//	               },{ 
+	            	   name: "watch",
+	            	   size: [0.1,0.1/2,0],
+	            	   textureSprite : [2,11],
+	            	   textureSize : [2,1],
+	            	   collissionModifier : 0.8,
+	            	   collission : function(o){
+	            		   o.makeIdle();
+	            		   game.score += 5;
+	            		   if(!game.player.invulnerable){
+	            			   game.player.invulnerable = true;
+		            		   game.player.alpha = 0.5;
+		            		   setTimeout(function(){
+		            			   game.player.small = false;
+		            			   game.player.invulnerable = false;
+		            			   game.player.alpha = 1;
+		            		   }, 3000);
+	            		   }
+	            	   }
+	               },{ 
 	            	   name: "star",
 	            	   size: [0.1,0.1/2,0],
 	            	   textureSprite : [4,11],
@@ -100,7 +108,8 @@ Object = function(type){
 	            	   collissionModifier : 0.8,
 	            	   collission : function(o){
 	            		   //object.position = [object.position[0], -2, object.position[2]];
-	            		   game.die();
+	            		   if(!game.player.invulnerable)
+	            			   game.die();
 	            	   }
 	               }
 	               ];
@@ -109,8 +118,7 @@ Object = function(type){
 	object.position = [0, -1*game.bg.size[1], Math.random()/100];
 	object.collissionModifier = 0.8;
 	object.texture.enabled = true;
-
-	var type = ObjectTypes[type != 'B' ? 3 : Math.round(Math.random())*2];
+	var type = ObjectTypes[objectType != 'B' ? 4 : Math.round(Math.random()*3)];
 	object.size  = type.size;
 	object.texture.sprite = type.textureSprite;
 	object.texture.size = type.textureSize;
@@ -175,8 +183,10 @@ Player = function(){
 		size : player.size,
 		collissionModifier : 0.6,
 		forkObject : forkObject,
+		alpha : 1,
 		fork : false,
 		small : false,
+		invulnerable : false,
 		tick : function(theta){
 			this.speed[0] += theta*2;
 			this.speed[1] += theta*2;
@@ -190,15 +200,19 @@ Player = function(){
 			player.position[0] += posChange;
 			this.position = player.position;
 			player.size = _.map(this.size, function(s,i){return s * 0.2 + player.size[i] * 0.8;}, this);
+			player.color[3] = this.alpha;
 			forkObject.size = player.size;
 			forkObject.position = player.position.slice();
 			forkObject.position[2] = -0.001;
 			forkObject.position[0] += 1.45*player.size[0];
 			if(this.fork){
-				forkObject.color[3] = 0.2 + forkObject.color[3]*0.8;
+				forkObject.color[3] = 0.2 + 0.8*(this.invulnerable ? this.alpha : forkObject.color[3]);
 			}
 			else{
 				forkObject.color[3] = forkObject.color[3]*0.8;
+			}
+			if(this.fork && this.invulnerable){
+				forkObject.color[3] = this.alpha;
 			}
 			if (isWallColliding(player)) {
 				var collidingWall = player.position[0]/Math.abs(player.position[0]); // -1 left, 1 right
