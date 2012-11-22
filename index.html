@@ -38,21 +38,22 @@ precision mediump int;    // GLSL ES section 4.5.2
 
 uniform mat4    uniform_Projection;  // Incomming data used by
 uniform mat4    uniform_Model;  // Incomming data used by
+
 attribute vec4  attribute_Position;  // the vertex shader
 attribute vec4  attribute_Color;     // uniform and attributes
+attribute vec2 a_texCoord; 
 
 varying vec4    varying_Color;  // Outgoing varying data
                                      // sent to the fragment shader
-
-attribute vec2 a_texCoord; 
 varying vec2 v_texCoord; 
+
 
 void main(void) {
  
   varying_Color = attribute_Color; 
   gl_Position = uniform_Projection * uniform_Model * attribute_Position; 
   v_texCoord = a_texCoord; 
-  gl_PointSize = 50.0;
+  gl_PointSize = 1.5;
 } 
 </script>
 
@@ -60,7 +61,7 @@ void main(void) {
 </head>
 <body>
 <div id="canvas">
-	<canvas id="the-canvas" width="920" height="800" style="border: none;"></canvas>
+	<canvas id="the-canvas" width="920" height="600" style="border: none;"></canvas>
 </div>
 </body>
 
