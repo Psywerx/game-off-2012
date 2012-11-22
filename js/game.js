@@ -96,6 +96,7 @@ var game = {
 			this.objects[i].tick(theta);
         }
 		this.scoreBoard.tick(theta);
+		this.point.tick(theta);
 	},
 	draw : function(gl){
 		
