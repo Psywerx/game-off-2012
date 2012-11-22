@@ -123,6 +123,9 @@ Object = function(objectType){
 	object.texture.sprite = type.textureSprite;
 	object.texture.size = type.textureSize;
 	object.type  = type;
+
+	var particles = new Point();
+	
 	return {
 		object : object,
 		velocity : [0,0,0],
@@ -132,6 +135,7 @@ Object = function(objectType){
 			game.idleObjects.push(this);
 			this.object.velocity = [0,0,0];
 			this.object.position[1] = -1*game.bg.size[1];
+			
 		},
 		tick : function(theta){
 			this.velocity[1] = game.objectSpeed;
@@ -146,8 +150,14 @@ Object = function(objectType){
 			
 			if(game.player.fork && game.areColliding(object, game.player.forkObject))
 				object.type.collission(this);
+		
+//			particles.position = object.position.slice();
+//			particles.position[1] -= 0.2;
+//			particles.position[2] += 0.001;
+//			particles.tick(theta);
 		},
 		draw : function(gl){
+			//particles.draw(gl);
 			object.draw(gl);
 		}
 	};
@@ -172,7 +182,7 @@ Player = function(){
 	forkObject.collissionModifier = 0.6,
 	forkObject.texture.size = [4,4];
 	
-	var particles = new Point();
+	
 	
 	
 	var isWallColliding = function(o){ // d = 1 left wall; d = -1 right wall
@@ -208,7 +218,6 @@ Player = function(){
 			forkObject.position = player.position.slice();
 			forkObject.position[2] = -0.001;
 			forkObject.position[0] += 1.45*player.size[0];
-			particles.position = player.position;
 			
 			
 			if(this.fork){
@@ -231,12 +240,10 @@ Player = function(){
 				player.position[0] = forkObject.position[0] - 1.45*player.size[0];
 				this.speed[0] = 0;
 			}
-			particles.tick(theta);
 		},
 		draw : function(gl){
 			player.draw(gl);
 			forkObject.draw(gl);
-			particles.draw(gl);
 		}
 	};
 };
@@ -278,9 +285,9 @@ Point = function(){
 	var vertices = [];
 	var colors = [];
 	var speed  = [];
-	for (var i = 0; i < 500; i++){
-		vertices.push(Math.random());
-		vertices.push(Math.random());
+	for (var i = 0; i < 50; i++){
+		vertices.push(Math.random()*0.5-0.4);
+		vertices.push(2);
 		vertices.push(0);
 		
 		colors.push(0);
@@ -335,7 +342,7 @@ Point = function(){
 				if(vertices[i+1] > 0.2){
 					vertices[i+1] = 0;
 				}
-				colors[i/3*4+3] = 1-vertices[i+1]*5;
+				colors[i/3*4+3] = vertices[i+1]*5;
 			}
 		}
 	};

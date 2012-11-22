@@ -3,12 +3,12 @@ var game = {
 	init : function(){
 		this.bg = Background();
 		this.player = Player();
-		this.point = Point();
 		this.objects = [];
 		this.idleObjects = [];
 		this.objectSpeed = 0.8;
-		this.objectDelay = 1600;
+		this.objectDelay = 1.600;
 		this.timePlayed = 0;
+		this.generatorCnt = 0;
 		// Generate bonuses:
 		for(var i=0, j=0; i < 17*2; [i++, j++]){
 			var o = Object('B');
@@ -36,17 +36,25 @@ var game = {
 		this.score = 0;
 		this.death = false;
 		this.pause = false;
-		setTimeout(this.generator, game.objectDelay);
 		
 	},
-	generator : function(){
+	generator : function(theta){
+		this.generatorCnt += theta;
+		
+		if(this.generatorCnt < this.objectDelay/this.objectSpeed) return;
+		this.generatorCnt = 0;
+		
+		
 		if(game.death || game.pause) return;
-		var i = Math.floor(Math.random() * game.idleObjects.length);
-		var o = game.idleObjects[i];
-		game.idleObjects.splice(i, 1); // get random element;
-		o.velocity = [0, game.objectSpeed, 0];
-		game.objects.push(o);
-		setTimeout(game.generator, Math.max(500,game.objectDelay-Math.pow(game.timePlayed, 2)));
+		console.log(this.timePlayed);
+		for(var j=0; j<Math.log(this.timePlayed);j++){
+			var i = Math.floor(Math.random() * game.idleObjects.length);
+			var o = game.idleObjects[i];
+			game.idleObjects.splice(i, 1); // get random element;
+			o.velocity = [0, game.objectSpeed, 0];
+			o.position[1] += j*0.2;
+			game.objects.push(o);
+		}
 	},
 	keydown : function(event){
 		switch (event.keyCode) {
@@ -88,6 +96,7 @@ var game = {
 	tick : function(theta){
 		this.smooth = 0.8*this.smooth + 0.2*(game.player.direction[0] + game.player.direction[1]);
 		if(this.death || this.pause) return;
+		this.generator(theta);
 		this.timePlayed += theta;
 		game.objectSpeed = Math.min(1.5, game.objectSpeed + this.timePlayed*0.000005);
 		this.bg.tick(theta);
@@ -96,7 +105,6 @@ var game = {
 			this.objects[i].tick(theta);
         }
 		this.scoreBoard.tick(theta);
-		this.point.tick(theta);
 	},
 	draw : function(gl){
 		
@@ -129,6 +137,5 @@ var game = {
         this.player.draw(gl);
         this.bg.draw(gl);
         this.scoreBoard.draw(gl);
-        this.point.draw(gl);
 	}
 };
