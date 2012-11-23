@@ -1,6 +1,5 @@
 var game = {
 
-    timeouts : [],
 
 	state : {
 		PLAY : 0,
@@ -206,10 +205,4 @@ var game = {
         	this.pause.draw(gl);
         }
     },
-    localTimeout : function(name,f,t){
-        if (this.timeouts[name]){
-            clearTimeout(this.timeouts[name]);
-        }
-        this.timeouts[name] = setTimeout(f,t);
-	}
 };

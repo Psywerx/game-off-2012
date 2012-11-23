@@ -140,7 +140,7 @@ Object = function(objectType){
                        collission : function(o,p){
                            o.makeIdle();
                            game.score += 5;
-                           game.localTimeout(this.name,function(){
+                           p.localTimeout(this.name,function(){
                                p.invulnerable = false;
                                p.alpha = 1;
                            },3000);
@@ -158,7 +158,7 @@ Object = function(objectType){
                            game.score += 5;
                            p.small = true;
                            p.size = [0.1, 0.1, 0];
-                           game.localTimeout(this.name,function(){
+                           p.localTimeout(this.name,function(){
                                p.small = false;
                                p.size = [0.2, 0.2, 0];
                            }, 3000);
@@ -172,7 +172,7 @@ Object = function(objectType){
                        collission : function(o,p){
                            game.score += 5;
                            o.makeIdle();
-                           game.localTimeout(this.name,function(){
+                           p.localTimeout(this.name,function(){
                                p.fork = false;
                            }, 3000);
                            p.fork = true;
@@ -272,6 +272,7 @@ Player = function(){
     };
     
     return {
+        timeouts : [],
         speed : [0,0,0],
         direction : [0,0,0],
         position : player.position,
@@ -332,6 +333,12 @@ Player = function(){
         draw : function(gl){
             player.draw(gl);
             forkObject.draw(gl);
+        },
+        localTimeout : function(name,f,t){
+            if (this.timeouts[name]){
+                clearTimeout(this.timeouts[name]);
+            }
+            this.timeouts[name] = setTimeout(f,t);
         }
     };
 };
