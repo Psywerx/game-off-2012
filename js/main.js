@@ -6,14 +6,14 @@ Main = {
 		$(document).keydown(game.keydown);
 		$(document).keyup(game.keyup);
 		$(window).focus(function(){
-				if(game.pause){
-					game.pause = false;
+				if(game.currentState == game.state.PAUSE){
+					game.currentState = game.state.PLAY;
 					Main.t0 = Date.now();
-					setTimeout(game.generator, Math.max(200,(game.objectDelay-Math.pow(game.timePlayed,1.2))/(1+game.objectSpeed)));
 				}
 			});
 		$(window).blur(function(){
-			game.pause = true;
+			if(game.currentState == game.state.PLAY)
+				game.currentState = game.state.PAUSE;
 		});
 
 		
@@ -21,7 +21,7 @@ Main = {
 		this.canvas = $("#the-canvas")[0];
 		
 		gl = WebGLUtils.setupWebGL(this.canvas);
-		if (!gl) {
+		if (!gl)  {
 			console.log("Sorry, something went wrong :(");
 		}
 		

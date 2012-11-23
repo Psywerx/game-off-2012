@@ -1,3 +1,87 @@
+Death = function(){
+	var death = new Square();
+	death.color = [0.3,0.3,0.3,0.4];
+	death.size  = [1, 0.6, 1];
+	death.position = [0,-0.05,-0.5];
+	death.texture.enabled = false;
+	
+	var text = new Text("Game Over");
+	text.position([0.40,0.1,-0.51]);
+	
+	var press = new Text("Press <space> to restart");
+	press.size([0.045, 0.045, 0]);
+	press.position([0.85,-0.25,-0.51]);
+	
+	return {
+		
+		tick: function(theta){
+			
+		},
+		draw: function(gl){
+			death.draw(gl);
+			text.draw(gl);
+			press.draw(gl);
+		}
+	};
+};
+
+
+Pause = function(){
+	var pause = new Square();
+	pause.color = [0.3,0.3,0.3,0.4];
+	pause.size  = [1, 0.4, 1];
+	pause.position = [-0.23,-0.05,-0.5];
+	pause.texture.enabled = false;
+	
+	var text = new Text("Game paused");
+	text.position([0.25,-0.0,-0.51]);
+	
+	return {
+		
+		tick: function(theta){
+			
+		},
+		draw: function(gl){
+			pause.draw(gl);
+			text.draw(gl);
+		}
+	};
+};
+
+Text = function(string){
+	var squares = [];
+	for(var i = 0; i < string.length; i++){
+		var s = new Square();
+		s.texture.enabled = true;
+		s.texture.fromChar(string.charAt(i));
+		s.color = [0.3,0.3,0.3,1];
+		s.size  = [0.075,0.075,0];
+		s.position = [-i/10-(s.size[0]*10), 1.33, -0.01];
+		squares.push(s);
+	}
+	return {
+		size : function(size){
+			for(var i = 0; i < string.length; i++){
+				squares[i].size = size;
+			}
+		},
+		position : function(pos){
+			for(var i = 0; i < string.length; i++){
+				// TODO: This is some ugly code, make it better
+				squares[i].position = [pos[0]-i/(18-squares[i].size[0]*100), pos[1], pos[2]];
+			}
+		},
+		tick : function(theta){
+			
+		},
+		draw : function(gl){
+			for(var i = 0; i < string.length; i++){
+				squares[i].draw(gl);
+			}
+		}
+	};
+};
+
 Score = function(){
 	
 	var squares = [];

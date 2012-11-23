@@ -1,4 +1,11 @@
 var game = {
+
+	state : {
+		PLAY : 0,
+		PAUSE : 1,
+		DEATH : 2,
+		MENU : 3
+	},
 		
 	init : function(){
 		this.bg = Background();
@@ -9,6 +16,7 @@ var game = {
 		this.objectDelay = 1.600;
 		this.timePlayed = 0;
 		this.generatorCnt = 0;
+		
 		// Generate bonuses:
 		for(var i=0, j=0; i < 17*2; [i++, j++]){
 			var o = Object('B');
@@ -20,6 +28,7 @@ var game = {
 			o.position[0] = position;
 			this.idleObjects.push(o);
 		}
+		
 		// Generate obstacles:
 		for(var i=0, j=0; i < 7*20; [i++, j++]){
 			var o = Object('O');
@@ -31,11 +40,17 @@ var game = {
 			o.position[0] = position;
 			this.idleObjects.push(o);
 		}
+		
+		// Pause menu:
+		this.pause = Pause();
+		
+		this.death = Death();
+		
 		this.smooth = 0;
 		this.scoreBoard = Score();
 		this.score = 0;
-		this.death = false;
-		this.pause = false;
+		
+		game.currentState = game.state.PLAY;
 		
 	},
 	generator : function(theta){
@@ -43,16 +58,12 @@ var game = {
 		
 		if(this.generatorCnt < this.objectDelay/this.objectSpeed) return;
 		this.generatorCnt = 0;
-		
-		
-		if(game.death || game.pause) return;
-		console.log(this.timePlayed);
 		for(var j=0; j<Math.log(this.timePlayed);j++){
 			var i = Math.floor(Math.random() * game.idleObjects.length);
 			var o = game.idleObjects[i];
 			game.idleObjects.splice(i, 1); // get random element;
 			o.velocity = [0, game.objectSpeed, 0];
-			o.position[1] += j*0.2;
+			o.position[1] += j*0.25;
 			game.objects.push(o);
 		}
 	},
@@ -80,7 +91,7 @@ var game = {
         }
 	},
 	die : function(){
-		this.death = true;
+		game.currentState = game.state.DEATH;
 	},
 	restart : function(){
 		this.init();
@@ -94,17 +105,29 @@ var game = {
 		
 	},
 	tick : function(theta){
+		
+		// The left/right animation should be present always:
 		this.smooth = 0.8*this.smooth + 0.2*(game.player.direction[0] + game.player.direction[1]);
-		if(this.death || this.pause) return;
-		this.generator(theta);
-		this.timePlayed += theta;
-		game.objectSpeed = Math.min(1.5, game.objectSpeed + this.timePlayed*0.000005);
-		this.bg.tick(theta);
-		this.player.tick(theta);
-		for(var i=0; i < this.objects.length; i++){
-			this.objects[i].tick(theta);
-        }
-		this.scoreBoard.tick(theta);
+		
+		switch(game.currentState){
+		case game.state.PAUSE:
+			break;
+		case game.state.PLAY:
+			this.generator(theta);
+			this.timePlayed += theta;
+			game.objectSpeed = Math.min(1.5, game.objectSpeed + this.timePlayed*0.000005);
+			this.bg.tick(theta);
+			this.player.tick(theta);
+			for(var i=0; i < this.objects.length; i++){
+				this.objects[i].tick(theta);
+			}
+			this.scoreBoard.tick(theta);
+			break;
+		case game.state.MENU:
+			break;
+		case game.state.DEATH:
+			break;
+		}
 	},
 	draw : function(gl){
 		
@@ -128,6 +151,8 @@ var game = {
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         
+        
+        
         this.objects.sort(function(a,b){
         	return b.position[2] - a.position[2]; 
         });
@@ -137,5 +162,13 @@ var game = {
         this.player.draw(gl);
         this.bg.draw(gl);
         this.scoreBoard.draw(gl);
+        if(game.currentState == game.state.DEATH){
+        	// SAY SOMETHING:
+        	this.death.draw(gl);
+        }
+        else if(game.currentState == game.state.PAUSE){
+        	// SAY SOMETHING:
+        	this.pause.draw(gl);
+        }
 	}
 };
