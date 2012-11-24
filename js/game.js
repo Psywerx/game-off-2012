@@ -183,10 +183,19 @@ var game = {
 			this.bg.tick(theta);
 			
 			var prevPosition = game.player.position.slice();
-			var prevPosition2 = game.player2.position.slice();
-			
+
 			this.player.tick(theta);
+			
+			for(var i=0; i < this.objects.length; i++){
+			    this.objects[i].tick(theta);
+			}
+			this.scoreBoard.tick(theta);
+
+			if(game.menuSelection == game.menuState.SINGLEPLAYER)
+			    return
+			
 			this.player2.tick(theta);
+			var prevPosition2 = game.player2.position.slice();
 			
 			if(game.player.alpha == 1 && game.player2.alpha == 1 && ( 
 			   game.areColliding(game.player, game.player2) ||
@@ -214,10 +223,6 @@ var game = {
                 }
 			}
 			
-			for(var i=0; i < this.objects.length; i++){
-				this.objects[i].tick(theta);
-			}
-			this.scoreBoard.tick(theta);
 			break;
 		case game.state.MENU:
 		    this.menu.tick(theta);
@@ -227,7 +232,7 @@ var game = {
 		}
 	},
 	draw : function(gl){
-		
+		console.log(game.currentState);
 		var program = Main.program; // Local pointer to shader program
 		
 		gl.enable(gl.DEPTH_TEST);

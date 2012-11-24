@@ -6,6 +6,7 @@ Main = {
 		$(document).keydown(game.keydown);
 		$(document).keyup(game.keyup);
 		$(window).focus(function(){
+		    console.log(game.currentState, "FOCUS");
 				if(game.currentState == game.state.PAUSE){
 					game.currentState = game.state.PLAY;
 					Main.t0 = Date.now();

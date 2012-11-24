@@ -324,6 +324,7 @@ Player = function(){
         },
         tick : function(theta){
             player.disabled = this.disabled;
+            if(player.disabled) return;
             this.speed[0] += theta*2;
             this.speed[1] += theta*2;
             if(this.direction[0] == 0) this.speed[0] = 0;
