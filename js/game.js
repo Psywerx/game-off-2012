@@ -52,11 +52,15 @@ var game = {
 		
 		this.death = Death();
 		
-		this.smooth = 0;
+		this.menu = Menu();
+		
+		this.menuSelection = 0;
+		this.menuDirection = [0,0];
+		this.smooth = [0,0];
 		this.scoreBoard = Score();
 		this.score = 0;
 		
-		game.currentState = game.state.PLAY;
+		game.currentState = game.state.MENU;
 		
 	},
 	generator : function(theta){
@@ -75,6 +79,12 @@ var game = {
 	},
 	keydown : function(event){
 		switch (event.keyCode) {
+		case KeyEvent.VK_DOWN:
+		    game.menuDirection[0] = 1;
+		    break;
+		case KeyEvent.VK_UP:
+            game.menuDirection[1] = -1;
+            break;
         case KeyEvent.VK_LEFT:
             game.player.direction[0] = 1;
             break;
@@ -94,6 +104,15 @@ var game = {
 	},
 	keyup : function(event){
 		switch (event.keyCode) {
+		case KeyEvent.VK_DOWN:
+            game.menuDirection[0] = 0;
+            game.menuSelection = (game.menuSelection+1)%4;
+            break;
+        case KeyEvent.VK_UP:
+            game.menuDirection[1] = 0;
+            game.menuSelection = (game.menuSelection-1)%4;
+            game.menuSelection = game.menuSelection < 0 ? 3 : game.menuSelection;
+            break;
         case KeyEvent.VK_LEFT:
         	game.player.direction[0] = 0;
             break;
@@ -125,7 +144,8 @@ var game = {
 	tick : function(theta){
 		
 		// The left/right animation should be present always:
-		this.smooth = 0.8*this.smooth + 0.2*(game.player.direction[0] + game.player.direction[1]);
+		this.smooth[0] = 0.8*this.smooth[0] + 0.2*(game.player.direction[0] + game.player.direction[1]);
+		this.smooth[1] = 0.8*this.smooth[1] + 0.2*(game.menuDirection[0] + game.menuDirection[1]);
 		
 		switch(game.currentState){
 		case game.state.PAUSE:
@@ -157,6 +177,7 @@ var game = {
 			this.scoreBoard.tick(theta);
 			break;
 		case game.state.MENU:
+		    this.menu.tick(theta);
 			break;
 		case game.state.DEATH:
 			break;
@@ -177,7 +198,8 @@ var game = {
         var ratio = Main.WIDTH / Main.HEIGHT;
         var model_projection = mat4.lookAt([0,0,-3], [0,0,0], [0,1,0]);
         var model_view_projection = mat4.frustum(-ratio, ratio, -1, 1, 2, 6);
-        model_projection = mat4.rotate(model_projection, this.smooth*-0.1, [0,1,0]);
+        model_projection = mat4.rotate(model_projection, this.smooth[0]*-0.1, [0,1,0]);
+        model_projection = mat4.rotate(model_projection, this.smooth[1]*-0.1, [1,0,0]);
         var projection = mat4.multiply(model_view_projection, model_projection);
         
         gl.uniformMatrix4fv(program.projectionMatrix_location, false, projection);
@@ -196,13 +218,18 @@ var game = {
         this.player2.draw(gl);
         this.bg.draw(gl);
         this.scoreBoard.draw(gl);
-        if(game.currentState == game.state.DEATH){
-        	// SAY SOMETHING:
-        	this.death.draw(gl);
+        
+        switch(game.currentState){
+        case(game.state.DEATH):
+            this.death.draw(gl);
+            break;
+        case(game.state.PAUSE):
+            this.pause.draw(gl);
+            break;
+        case(game.state.MENU):
+            this.menu.draw(gl);
+            break;
         }
-        else if(game.currentState == game.state.PAUSE){
-        	// SAY SOMETHING:
-        	this.pause.draw(gl);
-        }
+        
     },
 };

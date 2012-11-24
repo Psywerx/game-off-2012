@@ -1,6 +1,36 @@
+Menu = function(){
+    var s = new Square();
+    s.texture.enabled = true;
+    s.texture.fromChar("0");
+    s.color = [0,0,0,1];
+    s.size  = [0.75,0.75/1.3,0];
+    s.position = [0,-0.05,-0.5];
+    s.texture.sprite = [19,0];
+    s.texture.size = [13,10];
+    
+    var selector = new Square();
+    selector.texture.enabled = false;
+    selector.color = [0.9,0.9,0.9,0.5];
+    selector.size = [0.4,0.07, 0];
+    selector.position =[0,0.11, -0.51];
+    
+    
+    return{
+        tick : function(gl){
+            var about= game.menuSelection == 3 ? 1.1 : 0;
+            selector.position[1] = (-1.1*(game.menuSelection+about)+1)*0.12;
+        },
+        draw : function(gl){
+            s.draw(gl);
+            selector.draw(gl);
+        }
+    }
+};
+
+
 Death = function(){
     var death = new Square();
-    death.color = [0.3,0.3,0.3,0.4];
+    death.color = [0.5,0.5,0.5,0.8];
     death.size  = [1, 0.6, 1];
     death.position = [0,-0.05,-0.5];
     death.texture.enabled = false;
