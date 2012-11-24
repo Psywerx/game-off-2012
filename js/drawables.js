@@ -223,6 +223,7 @@ Object = function(objectType){
     object.color = [0,0,0,1];
     object.position = [0, -1*game.bg.size[1], Math.random()/100];
     object.collissionModifier = 0.8;
+    object.alpha = 1;
     object.texture.enabled = true;
     var type = ObjectTypes[objectType != 'B' ? 4 : Math.round(Math.random()*3)];
     object.size  = type.size;

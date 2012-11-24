@@ -168,13 +168,20 @@ var game = {
 			this.player.tick(theta);
 			this.player2.tick(theta);
 			
-			if(game.areColliding(game.player, game.player2) ||
+			if(game.player.alpha == 1 && game.player2.alpha == 1 && ( 
+			   game.areColliding(game.player, game.player2) ||
 			   (game.player.fork && game.areColliding(game.player.forkObject, game.player2)) ||
-			   (game.player2.fork && game.areColliding(game.player, game.player2.forkObject))){
-				game.player.setPosition(prevPosition);
-				game.player2.setPosition(prevPosition2);
-				game.player.speed = [0,0,0];
-				game.player2.speed = [0,0,0];
+			   (game.player2.fork && game.areColliding(game.player, game.player2.forkObject)))){
+			    if(game.player.position[0] < game.player2.position[0]){
+			        if(game.player.direction[0] != 0){
+			            game.player.setPosition(prevPosition);
+			            game.player.speed = [0,0,0];
+			        }
+			        if(game.player2.direction[1] != 0){
+                        game.player2.setPosition(prevPosition2);
+                        game.player2.speed = [0,0,0];
+                    }
+			    }
 			}
 			
 			for(var i=0; i < this.objects.length; i++){
