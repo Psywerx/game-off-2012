@@ -182,6 +182,16 @@ var game = {
                         game.player2.speed = [0,0,0];
                     }
 			    }
+			    if(game.player.position[0] > game.player2.position[0]){
+                    if(game.player.direction[1] != 0){
+                        game.player.setPosition(prevPosition);
+                        game.player.speed = [0,0,0];
+                    }
+                    if(game.player2.direction[0] != 0){
+                        game.player2.setPosition(prevPosition2);
+                        game.player2.speed = [0,0,0];
+                    }
+                }
 			}
 			
 			for(var i=0; i < this.objects.length; i++){
