@@ -12,13 +12,13 @@ Menu = function(){
     selector.texture.enabled = false;
     selector.color = [0.9,0.9,0.9,0.5];
     selector.size = [0.4,0.07, 0];
-    selector.position =[0,0.11, -0.51];
+    selector.position =[0, 0.10, -0.51];
     
     
     return{
         tick : function(gl){
-            var about= game.menuSelection == 3 ? 1.1 : 0;
-            selector.position[1] = (-1.1*(game.menuSelection+about)+1)*0.12;
+            var about= game.menuSelection == 3 ? 1 : 0;
+            selector.position[1] = (-1.1*(game.menuSelection+0.1+about)+1)*0.12;
         },
         draw : function(gl){
             s.draw(gl);

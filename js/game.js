@@ -81,9 +81,12 @@ var game = {
 		switch (event.keyCode) {
 		case KeyEvent.VK_DOWN:
 		    game.menuDirection[0] = 1;
+		    game.menuSelection = (game.menuSelection+1)%4;
 		    break;
 		case KeyEvent.VK_UP:
             game.menuDirection[1] = -1;
+            game.menuSelection = (game.menuSelection-1)%4;
+            game.menuSelection = game.menuSelection < 0 ? 3 : game.menuSelection;
             break;
         case KeyEvent.VK_LEFT:
             game.player.direction[0] = 1;
@@ -104,14 +107,17 @@ var game = {
 	},
 	keyup : function(event){
 		switch (event.keyCode) {
+		case KeyEvent.VK_RETURN:
+		    console.log("ENTER");
+		    game.currentState = game.state.PLAY;
+		    break;
 		case KeyEvent.VK_DOWN:
             game.menuDirection[0] = 0;
-            game.menuSelection = (game.menuSelection+1)%4;
+            
             break;
         case KeyEvent.VK_UP:
             game.menuDirection[1] = 0;
-            game.menuSelection = (game.menuSelection-1)%4;
-            game.menuSelection = game.menuSelection < 0 ? 3 : game.menuSelection;
+            
             break;
         case KeyEvent.VK_LEFT:
         	game.player.direction[0] = 0;
