@@ -232,7 +232,6 @@ var game = {
 		}
 	},
 	draw : function(gl){
-		console.log(game.currentState);
 		var program = Main.program; // Local pointer to shader program
 		
 		gl.enable(gl.DEPTH_TEST);
