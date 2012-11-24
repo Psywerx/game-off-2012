@@ -260,7 +260,7 @@ Object = function(objectType){
             if(game.areColliding(object, game.player2))
                 object.type.collission(this, game.player2);
             
-            if(game.player.fork && game.areColliding(object, game.player2.forkObject))
+            if(game.player2.fork && game.areColliding(object, game.player2.forkObject))
                 object.type.collission(this, game.player2);
 
 //            particles.position = object.position.slice();
