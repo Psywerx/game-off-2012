@@ -240,8 +240,10 @@ var game = {
         var ratio = Main.WIDTH / Main.HEIGHT;
         var model_projection = mat4.lookAt([0,0,-3], [0,0,0], [0,1,0]);
         var model_view_projection = mat4.frustum(-ratio, ratio, -1, 1, 2, 6);
-        model_projection = mat4.rotate(model_projection, this.smooth[0]*-0.1, [0,1,0]);
-        model_projection = mat4.rotate(model_projection, this.smooth[1]*-0.1, [1,0,0]);
+        if(game.menuState == game.menuState.SINGLEPLAYER)
+            model_projection = mat4.rotate(model_projection, this.smooth[0]*-0.1, [0,1,0]);
+        if(game.currentState == game.state.MENU)
+            model_projection = mat4.rotate(model_projection, this.smooth[1]*-0.1, [1,0,0]);
         var projection = mat4.multiply(model_view_projection, model_projection);
         
         gl.uniformMatrix4fv(program.projectionMatrix_location, false, projection);
