@@ -140,6 +140,7 @@ var game = {
         }
 	},
 	menuChanged : function(){
+	    
 	    if(game.currentState != game.state.MENU) return;
 	    if(game.menuSelection == game.menuState.SINGLEPLAYER){
 	        game.player.position[0] = 0;
