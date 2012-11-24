@@ -299,6 +299,7 @@ Player = function(){
     
     
     var isWallColliding = function(o){ // d = 1 left wall; d = -1 right wall
+        if(o.disabled) return false;
         return o.position[0] < -1*(game.bg.size[0]-o.size[0]) || o.position[0] > (game.bg.size[0]-o.size[0]);
     };
     
@@ -314,6 +315,7 @@ Player = function(){
         fork : false,
         small : false,
         invulnerable : false,
+        disabled : false,
         setPosition : function(pos){
             player.position = pos;
             forkObject.position = player.position.slice();
@@ -321,6 +323,7 @@ Player = function(){
             forkObject.position[0] += 1.45*player.size[0];
         },
         tick : function(theta){
+            player.disabled = this.disabled;
             this.speed[0] += theta*2;
             this.speed[1] += theta*2;
             if(this.direction[0] == 0) this.speed[0] = 0;

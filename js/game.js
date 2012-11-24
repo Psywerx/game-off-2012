@@ -7,15 +7,20 @@ var game = {
 		DEATH : 2,
 		MENU : 3
 	},
-		
+	menuState :{
+	    SINGLEPLAYER : 0,
+	    MULTIPLAYER : 1
+	},
+	menuSelection : 0,
 	init : function(){
 		this.bg = Background();
 		this.player = Player();
-		this.player.position[0] = -1;
+		this.player.position[0] = 0;
 		
 		this.player2 = Player();
-		this.player2.position[0] = 1;
+		this.player2.position[0] = 101;
 		this.player2.position[2] = this.player.position[2] - 0.01;
+		this.player2.disabled = true;
 		this.objects = [];
 		this.idleObjects = [];
 		this.objectSpeed = 0.8;
@@ -54,13 +59,13 @@ var game = {
 		
 		this.menu = Menu();
 		
-		this.menuSelection = 0;
+		
 		this.menuDirection = [0,0];
 		this.smooth = [0,0];
 		this.scoreBoard = Score();
 		this.score = 0;
-		
 		game.currentState = game.state.MENU;
+		game.menuChanged();
 		
 	},
 	generator : function(theta){
@@ -82,11 +87,13 @@ var game = {
 		case KeyEvent.VK_DOWN:
 		    game.menuDirection[0] = 1;
 		    game.menuSelection = (game.menuSelection+1)%4;
+		    game.menuChanged();
 		    break;
 		case KeyEvent.VK_UP:
             game.menuDirection[1] = -1;
             game.menuSelection = (game.menuSelection-1)%4;
             game.menuSelection = game.menuSelection < 0 ? 3 : game.menuSelection;
+            game.menuChanged();
             break;
         case KeyEvent.VK_LEFT:
             game.player.direction[0] = 1;
@@ -108,7 +115,6 @@ var game = {
 	keyup : function(event){
 		switch (event.keyCode) {
 		case KeyEvent.VK_RETURN:
-		    console.log("ENTER");
 		    game.currentState = game.state.PLAY;
 		    break;
 		case KeyEvent.VK_DOWN:
@@ -132,6 +138,19 @@ var game = {
         	game.player2.direction[1] = 0;
             break;
         }
+	},
+	menuChanged : function(){
+	    if(game.currentState != game.state.MENU) return;
+	    if(game.menuSelection == game.menuState.SINGLEPLAYER){
+	        game.player.position[0] = 0;
+	        game.player2.position[0] = 100;
+	        game.player2.disabled = true;
+	    }
+	    else if(game.menuSelection == game.menuState.MULTIPLAYER){
+	        game.player.position[0] = -1;
+	        game.player2.position[0] = 1;
+	        game.player2.disabled = false;
+	    }
 	},
 	die : function(){
 		game.currentState = game.state.DEATH;
