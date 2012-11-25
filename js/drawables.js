@@ -253,7 +253,7 @@ Object = function(objectType){
     object.collissionModifier = 0.8;
     object.alpha = 1;
     object.texture.enabled = true;
-    var type = ObjectTypes[objectType != 'B' ? 4 : Math.round(Math.random()*3)];//Math.round(Math.random()*3)];
+    var type = ObjectTypes[objectType != 'B' ? Math.round(Math.random()*4) : Math.round(Math.random()*3)];//Math.round(Math.random()*3)];
     object.size  = type.size;
     object.texture.sprite = type.textureSprite;
     object.texture.size = type.textureSize;
@@ -312,6 +312,7 @@ Player = function(){
     player.texture.enabled = true;
     player.texture.sprite = [0,6];
     player.texture.size = [4,4];
+    player.alpha = 1;
     
     
     var forkObject = new Square();
@@ -365,7 +366,7 @@ Player = function(){
             player.position[0] += posChange;
             this.position = player.position;
             player.size = _.map(this.size, function(s,i){return s * 0.2 + player.size[i] * 0.8;}, this);
-            player.color[3] = this.alpha;
+            player.color[3] = this.alpha * 0.2 + player.color[3] * 0.8;
             forkObject.size = player.size;
             forkObject.position = player.position.slice();
 			forkObject.position[2] = player.position[2] - 0.00001;
@@ -373,14 +374,13 @@ Player = function(){
             
             
             if(this.fork){
-                forkObject.color[3] = 0.2 + 0.8*(this.invulnerable ? this.alpha : forkObject.color[3]);
+                forkObject.color[3] = this.alpha * 0.2 + forkObject.color[3] * 0.8;
+                    //0.2 + 0.8*(this.invulnerable ? this.alpha : forkObject.color[3]);
             }
             else{
                 forkObject.color[3] = forkObject.color[3]*0.8;
             }
-            if(this.fork && this.invulnerable){
-                forkObject.color[3] = this.alpha;
-            }
+
             if (isWallColliding(player)) {
                 var collidingWall = player.position[0]/Math.abs(player.position[0]); // -1 left, 1 right
                 player.position[0]     = collidingWall*(game.bg.size[0]-forkObject.size[0]);
