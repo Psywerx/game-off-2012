@@ -9,9 +9,11 @@ var game = {
 	},
 	menuState :{
 	    SINGLEPLAYER : 0,
-	    MULTIPLAYER : 1
+	    MULTIPLAYER : 1,
+	    HIGHSCORES: 2,
+	    ABOUT: 3
 	},
-	menuSelection : 0,
+	currentMenu : 0,
 	init : function(){
 		this.bg = Background();
 		this.player = Player();
@@ -86,13 +88,13 @@ var game = {
 		switch (event.keyCode) {
 		case KeyEvent.VK_DOWN:
 		    game.menuDirection[0] = 1;
-		    game.menuSelection = (game.menuSelection+1)%4;
+		    game.currentMenu = (game.currentMenu+1)%4;
 		    game.menuChanged();
 		    break;
 		case KeyEvent.VK_UP:
             game.menuDirection[1] = -1;
-            game.menuSelection = (game.menuSelection-1)%4;
-            game.menuSelection = game.menuSelection < 0 ? 3 : game.menuSelection;
+            game.currentMenu = (game.currentMenu-1)%4;
+            game.currentMenu = game.currentMenu < 0 ? 3 : game.currentMenu;
             game.menuChanged();
             break;
         case KeyEvent.VK_LEFT:
@@ -143,12 +145,12 @@ var game = {
 	menuChanged : function(){
 	    
 	    if(game.currentState != game.state.MENU) return;
-	    if(game.menuSelection == game.menuState.SINGLEPLAYER){
+	    if(game.currentMenu == game.menuState.SINGLEPLAYER){
 	        game.player.position[0] = 0;
 	        game.player2.position[0] = 100;
 	        game.player2.disabled = true;
 	    }
-	    else if(game.menuSelection == game.menuState.MULTIPLAYER){
+	    else if(game.currentMenu == game.menuState.MULTIPLAYER){
 	        game.player.position[0] = -1;
 	        game.player2.position[0] = 1;
 	        game.player2.disabled = false;
@@ -192,7 +194,7 @@ var game = {
 			}
 			this.scoreBoard.tick(theta);
 
-			if(game.menuSelection == game.menuState.SINGLEPLAYER)
+			if(game.currentMenu == game.menuState.SINGLEPLAYER)
 			    return
 			
 			this.player2.tick(theta);
@@ -250,7 +252,7 @@ var game = {
         var ratio = Main.WIDTH / Main.HEIGHT;
         var model_projection = mat4.lookAt([0,0,-3], [0,0,0], [0,1,0]);
         var model_view_projection = mat4.frustum(-ratio, ratio, -1, 1, 2, 6);
-        if(game.menuSelection == game.menuState.SINGLEPLAYER)
+        if(game.currentMenu == game.menuState.SINGLEPLAYER)
             model_projection = mat4.rotate(model_projection, this.smooth[0]*-0.1, [0,1,0]);
         if(game.currentState == game.state.MENU)
             model_projection = mat4.rotate(model_projection, this.smooth[1]*-0.1, [1,0,0]);

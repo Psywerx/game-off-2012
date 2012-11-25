@@ -17,14 +17,14 @@ Menu = function(){
     
     return{
         tick : function(gl){
-            var about= game.menuSelection == 3 ? 1 : 0;
-            selector.position[1] = (-1.1*(game.menuSelection+0.1+about)+1)*0.12;
+            var about= game.currentMenu == game.menuState.ABOUT ? 1 : 0;
+            selector.position[1] = (-1.1*(game.currentMenu+0.1+about)+1)*0.12;
         },
         draw : function(gl){
             s.draw(gl);
             selector.draw(gl);
         }
-    }
+    };
 };
 
 
@@ -225,7 +225,7 @@ Object = function(objectType){
     object.collissionModifier = 0.8;
     object.alpha = 1;
     object.texture.enabled = true;
-    var type = ObjectTypes[3];//Math.round(Math.random()*3)];
+    var type = ObjectTypes[objectType != 'B' ? 4 : Math.round(Math.random()*3)];//Math.round(Math.random()*3)];
     object.size  = type.size;
     object.texture.sprite = type.textureSprite;
     object.texture.size = type.textureSize;
