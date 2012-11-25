@@ -1,3 +1,31 @@
+Highscores = function(){
+    var bg = new Square();
+    bg.texture.enabled = true;
+    bg.texture.fromChar("0");
+    bg.color = [0,0,0,1];
+    bg.size  = [0.9,0.9/1.3,0];
+    bg.position = [0,-0.1,-0.5];
+    bg.texture.sprite = [17,17];
+    bg.texture.size = [15,12];
+    
+    var selector = new Square();
+    selector.texture.enabled = false;
+    selector.color = [0.9,0.9,0.9,0.5];
+    selector.size = [0.2,0.07, 0];
+    selector.position = [0.65, -0.5, -0.51];
+    
+    return{
+        tick : function(theta){
+            
+        },
+        draw : function(gl){
+            bg.draw(gl);
+            selector.draw(gl);
+        }
+    };
+    
+};
+
 Menu = function(){
     var s = new Square();
     s.texture.enabled = true;

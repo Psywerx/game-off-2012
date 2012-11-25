@@ -5,7 +5,8 @@ var game = {
 		PLAY : 0,
 		PAUSE : 1,
 		DEATH : 2,
-		MENU : 3
+		MENU : 3,
+		HIGHSCORES_LIST: 4
 	},
 	menuState :{
 	    SINGLEPLAYER : 0,
@@ -16,6 +17,7 @@ var game = {
 	currentMenu : 0,
 	init : function(){
 		this.bg = Background();
+		this.highscores = Highscores();
 		this.player = Player();
 		this.player.position[0] = 0;
 		
@@ -117,8 +119,19 @@ var game = {
 	keyup : function(event){
 		switch (event.keyCode) {
 		case KeyEvent.VK_RETURN:
-		    if(game.currentState == game.state.MENU)
-		        game.currentState = game.state.PLAY;
+		    if(game.currentState == game.state.MENU){
+		        if(game.currentMenu == game.menuState.ABOUT)
+		            window.location = "https://github.com/Psywerx/game-off-2012";
+		        else if(game.currentMenu == game.menuState.HIGHSCORES){
+		            game.currentState = game.state.HIGHSCORES_LIST;
+		        }
+		        else
+		            game.currentState = game.state.PLAY;
+		        
+		    }
+		    else if(game.currentState == game.state.HIGHSCORES_LIST){
+		        game.currentState = game.state.MENU;
+		    }
 		    break;
 		case KeyEvent.VK_DOWN:
             game.menuDirection[0] = 0;
@@ -281,6 +294,9 @@ var game = {
             break;
         case(game.state.PAUSE):
             this.pause.draw(gl);
+            break;
+        case(game.state.HIGHSCORES_LIST):
+            this.highscores.draw(gl);
             break;
         case(game.state.MENU):
             this.menu.draw(gl);
