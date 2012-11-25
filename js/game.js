@@ -115,7 +115,8 @@ var game = {
 	keyup : function(event){
 		switch (event.keyCode) {
 		case KeyEvent.VK_RETURN:
-		    game.currentState = game.state.PLAY;
+		    if(game.currentState == game.state.MENU)
+		        game.currentState = game.state.PLAY;
 		    break;
 		case KeyEvent.VK_DOWN:
             game.menuDirection[0] = 0;
