@@ -225,7 +225,7 @@ Object = function(objectType){
     object.collissionModifier = 0.8;
     object.alpha = 1;
     object.texture.enabled = true;
-    var type = ObjectTypes[objectType != 'B' ? 4 : Math.round(Math.random()*3)];
+    var type = ObjectTypes[3];//Math.round(Math.random()*3)];
     object.size  = type.size;
     object.texture.sprite = type.textureSprite;
     object.texture.size = type.textureSize;
@@ -359,7 +359,7 @@ Player = function(){
                 forkObject.position[0] = player.position[0] + 1.45*player.size[0];
                 this.speed[0] = 0;
             }
-            if(game.player.fork && isWallColliding(forkObject)){
+            if(this.fork && isWallColliding(forkObject)){
                 forkObject.position[0] = game.bg.size[0]-forkObject.size[0];
                 player.position[0] = forkObject.position[0] - 1.45*player.size[0];
                 this.speed[0] = 0;
