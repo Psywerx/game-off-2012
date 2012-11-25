@@ -3,7 +3,7 @@ Highscores = function(){
     bg.texture.enabled = true;
     bg.texture.fromChar("0");
     bg.color = [0,0,0,1];
-    bg.size  = [0.9,0.9/1.3,0];
+    bg.size  = [0.0,0.9/1.3,0];
     bg.position = [0,-0.1,-0.5];
     bg.texture.sprite = [17,17];
     bg.texture.size = [15,12];
@@ -15,8 +15,17 @@ Highscores = function(){
     selector.position = [0.65, -0.5, -0.51];
     
     return{
+        
+        size : [0,0,0],
+        
         tick : function(theta){
-            
+            bg.size[0] = this.size[0];
+            if(bg.size[0] > 0.85){
+                selector.color[3] = selector.color[3]*0.8 + 0.5*0.2;
+            }
+            else{
+                selector.color[3] = 0;
+            }
         },
         draw : function(gl){
             bg.draw(gl);
@@ -44,9 +53,20 @@ Menu = function(){
     
     
     return{
+        
+        size : [0,0,0],
+        
         tick : function(gl){
             var about= game.currentMenu == game.menuState.ABOUT ? 1 : 0;
             selector.position[1] = (-1.1*(game.currentMenu+0.1+about)+1)*0.12;
+            
+            s.size[0] = this.size[0];
+            if(s.size[0] > 0.73){
+                selector.color[3] = selector.color[3]*0.8 + 0.5*0.2;
+            }
+            else{
+                selector.color[3] = 0;
+            }
         },
         draw : function(gl){
             s.draw(gl);
@@ -313,7 +333,6 @@ Player = function(){
     player.texture.sprite = [0,6];
     player.texture.size = [4,4];
     
-    
     var forkObject = new Square();
     forkObject.color = [1,1,1,0];
     forkObject.size  = [0.2, 0.2, 1];
@@ -322,9 +341,6 @@ Player = function(){
     forkObject.texture.sprite = [4,6];
     forkObject.collissionModifier = 0.6,
     forkObject.texture.size = [4,4];
-    
-    
-    
     
     var isWallColliding = function(o){ // d = 1 left wall; d = -1 right wall
         if(o.disabled) return false;
