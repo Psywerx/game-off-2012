@@ -6,7 +6,8 @@ var game = {
 		PAUSE : 1,
 		DEATH : 2,
 		MENU : 3,
-		HIGHSCORES_LIST: 4
+		HIGHSCORES_LIST: 4,
+		HIGHSCORES_ADD : 5,
 	},
 	menuState :{
 	    SINGLEPLAYER : 0,
@@ -18,6 +19,7 @@ var game = {
 	init : function(){
 		this.bg = Background();
 		this.highscores = Highscores();
+		this.highscoresAdd = HighscoresAdd();
 		this.player = Player();
 		this.player.position[0] = 0;
 		
@@ -117,7 +119,27 @@ var game = {
 		}
 	},
 	keyup : function(event){
+	    
+	    event.preventDefault();
+	    if(game.currentState == game.state.HIGHSCORES_ADD){
+            // Add score with name...
+            if(event.keyCode == KeyEvent.VK_RETURN){
+                
+                var scores = storage.get('scores');
+                scores.push([game.highscoresAdd.getName(), game.score]);
+                storage.put('scores', scores);
+                
+                game.highscores.update();
+                game.currentState = game.state.HIGHSCORES_LIST;
+            }
+            else{
+                game.highscoresAdd.update(event.keyCode);
+            }
+            return;
+            
+        }
 		switch (event.keyCode) {
+		
 		case KeyEvent.VK_RETURN:
 		    if(game.currentState == game.state.MENU){
 		        if(game.currentMenu == game.menuState.ABOUT)
@@ -174,20 +196,38 @@ var game = {
 	        game.player2.disabled = false;
 	    }
 	},
+	isHighScore: function(){
+	    var scores = storage.get('scores');
+	    if(!(scores instanceof Array))
+	        scores = [];
+	    
+	    if(scores.length < 5){
+	        return true;
+	    }
+	    
+	    scores.sort(function(a,b){
+	        return b[1] - a[1]; 
+	    });
+	    
+	    for(var i = 0; i < 5; i++){
+	        if(game.score > scores[i][1]){
+	            return true;
+	        }
+	    }
+	    return false;
+	},
 	die : function(){
 	    
-	    var scores = storage.get('scores');
-        if(!(scores instanceof Array))
-            scores = [];
-        
-        scores.push(['???', game.score]);
-        scores.sort(function(a,b){
-            return b[1] - a[1]; 
-        });
-        storage.put('scores', scores);
+        //scores.push(['???', game.score]);
+        //storage.put('scores', scores);
 	    
-        game.highscores.update();	    
-		game.currentState = game.state.HIGHSCORES_LIST;
+	    if(game.isHighScore()){
+	        game.currentState = game.state.HIGHSCORES_ADD;
+	    }
+	    else{
+	        game.highscores.update();	    
+	        game.currentState = game.state.HIGHSCORES_LIST;
+	    }
 	},
 	restart : function(){
 		this.init();
@@ -271,6 +311,11 @@ var game = {
 		    game.highscores.size[0] = 0.9*game.highscores.size[0] + 0.1*0.9; 
 		    game.highscores.tick(theta);
 			break;
+			
+        case game.state.HIGHSCORES_ADD:
+            game.highscoresAdd.size[0] = 0.9*game.highscoresAdd.size[0] + 0.1*0.9; 
+            game.highscoresAdd.tick(theta);
+            break;
 		}
 	},
 	draw : function(gl){
@@ -316,6 +361,9 @@ var game = {
             break;
         case(game.state.PAUSE):
             this.pause.draw(gl);
+            break;
+        case(game.state.HIGHSCORES_ADD):
+            this.highscoresAdd.draw(gl);
             break;
         case(game.state.HIGHSCORES_LIST):
             this.highscores.draw(gl);
