@@ -14,8 +14,27 @@ Highscores = function(){
     selector.size = [0.2,0.07, 0];
     selector.position = [0.65, -0.5, -0.51];
     
+    function pad(number, length) {
+        var str = '' + number;
+        while (str.length < length) {
+            str = '0' + str;
+        }
+        return str;
+    }
+    
     return{
-        
+        scores : [],
+        update : function(){
+            var scores = storage.get('scores');
+            if(!(scores instanceof Array))
+                scores = [];
+            for(var i = 0; i < Math.min(5, scores.length); i++){
+                var t = Text((i+1) + ". " + scores[i][0] + " "+pad(scores[i][1], 4));
+                t.position([0.55,0.17-i*0.1,-0.52]);
+                t.size([0.05,0.05,0]);
+                this.scores.push(t);
+            }
+        },
         size : [0,0,0],
         
         tick : function(theta){
@@ -30,6 +49,9 @@ Highscores = function(){
         draw : function(gl){
             bg.draw(gl);
             selector.draw(gl);
+            for(var i=0; i<this.scores.length;i++){
+                this.scores[i].draw(gl);
+            }
         }
     };
     

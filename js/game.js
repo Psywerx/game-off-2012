@@ -124,6 +124,7 @@ var game = {
 		            window.location = "https://github.com/Psywerx/game-off-2012";
 		        else if(game.currentMenu == game.menuState.HIGHSCORES){
 		            game.currentState = game.state.HIGHSCORES_LIST;
+		            game.highscores.update();
 		            game.menu.size = [0,0,0];
 		        }
 		        else{
@@ -174,6 +175,18 @@ var game = {
 	    }
 	},
 	die : function(){
+	    
+	    var scores = storage.get('scores');
+        if(!(scores instanceof Array))
+            scores = [];
+        
+        scores.push(['???', game.score]);
+        scores.sort(function(a,b){
+            return b[1] - a[1]; 
+        });
+        storage.put('scores', scores);
+	    
+        game.highscores.update();	    
 		game.currentState = game.state.HIGHSCORES_LIST;
 	},
 	restart : function(){
@@ -253,6 +266,8 @@ var game = {
 		    this.menu.tick(theta);
 			break;
 		case game.state.HIGHSCORES_LIST:
+		    
+		    
 		    game.highscores.size[0] = 0.9*game.highscores.size[0] + 0.1*0.9; 
 		    game.highscores.tick(theta);
 			break;
