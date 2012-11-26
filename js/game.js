@@ -126,6 +126,8 @@ var game = {
             if(event.keyCode == KeyEvent.VK_RETURN){
                 
                 var scores = storage.get('scores');
+                if(!(scores instanceof Array))
+                    scores = [];
                 scores.push([game.highscoresAdd.getName(), game.score]);
                 storage.put('scores', scores);
                 
