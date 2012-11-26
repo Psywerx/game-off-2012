@@ -5,15 +5,21 @@ var game = {
 		PLAY : 0,
 		PAUSE : 1,
 		DEATH : 2,
-		MENU : 3
+		MENU : 3,
+		HIGHSCORES_LIST: 4,
+		HIGHSCORES_ADD : 5,
 	},
 	menuState :{
 	    SINGLEPLAYER : 0,
-	    MULTIPLAYER : 1
+	    MULTIPLAYER : 1,
+	    HIGHSCORES: 2,
+	    ABOUT: 3
 	},
-	menuSelection : 0,
+	currentMenu : 0,
 	init : function(){
 		this.bg = Background();
+		this.highscores = Highscores();
+		this.highscoresAdd = HighscoresAdd();
 		this.player = Player();
 		this.player.position[0] = 0;
 		
@@ -86,13 +92,13 @@ var game = {
 		switch (event.keyCode) {
 		case KeyEvent.VK_DOWN:
 		    game.menuDirection[0] = 1;
-		    game.menuSelection = (game.menuSelection+1)%4;
+		    game.currentMenu = (game.currentMenu+1)%4;
 		    game.menuChanged();
 		    break;
 		case KeyEvent.VK_UP:
             game.menuDirection[1] = -1;
-            game.menuSelection = (game.menuSelection-1)%4;
-            game.menuSelection = game.menuSelection < 0 ? 3 : game.menuSelection;
+            game.currentMenu = (game.currentMenu-1)%4;
+            game.currentMenu = game.currentMenu < 0 ? 3 : game.currentMenu;
             game.menuChanged();
             break;
         case KeyEvent.VK_LEFT:
@@ -113,10 +119,46 @@ var game = {
 		}
 	},
 	keyup : function(event){
+	    
+	    event.preventDefault();
+	    if(game.currentState == game.state.HIGHSCORES_ADD){
+            // Add score with name...
+            if(event.keyCode == KeyEvent.VK_RETURN){
+                
+                var scores = storage.get('scores');
+                scores.push([game.highscoresAdd.getName(), game.score]);
+                storage.put('scores', scores);
+                
+                game.highscores.update();
+                game.currentState = game.state.HIGHSCORES_LIST;
+            }
+            else{
+                game.highscoresAdd.update(event.keyCode);
+            }
+            return;
+            
+        }
 		switch (event.keyCode) {
+		
 		case KeyEvent.VK_RETURN:
-		    if(game.currentState == game.state.MENU)
-		        game.currentState = game.state.PLAY;
+		    if(game.currentState == game.state.MENU){
+		        if(game.currentMenu == game.menuState.ABOUT)
+		            window.location = "https://github.com/Psywerx/game-off-2012";
+		        else if(game.currentMenu == game.menuState.HIGHSCORES){
+		            game.currentState = game.state.HIGHSCORES_LIST;
+		            game.highscores.update();
+		            game.menu.size = [0,0,0];
+		        }
+		        else{
+		            game.currentState = game.state.PLAY;
+		            game.menu.size = [0,0,0];
+		        }
+		            
+		    }
+		    else if(game.currentState == game.state.HIGHSCORES_LIST){
+		        game.restart();
+		        game.highscores.size = [0,0,0];
+		    }
 		    break;
 		case KeyEvent.VK_DOWN:
             game.menuDirection[0] = 0;
@@ -143,19 +185,49 @@ var game = {
 	menuChanged : function(){
 	    
 	    if(game.currentState != game.state.MENU) return;
-	    if(game.menuSelection == game.menuState.SINGLEPLAYER){
+	    if(game.currentMenu == game.menuState.SINGLEPLAYER){
 	        game.player.position[0] = 0;
 	        game.player2.position[0] = 100;
 	        game.player2.disabled = true;
 	    }
-	    else if(game.menuSelection == game.menuState.MULTIPLAYER){
+	    else if(game.currentMenu == game.menuState.MULTIPLAYER){
 	        game.player.position[0] = -1;
 	        game.player2.position[0] = 1;
 	        game.player2.disabled = false;
 	    }
 	},
+	isHighScore: function(){
+	    var scores = storage.get('scores');
+	    if(!(scores instanceof Array))
+	        scores = [];
+	    
+	    if(scores.length < 5){
+	        return true;
+	    }
+	    
+	    scores.sort(function(a,b){
+	        return b[1] - a[1]; 
+	    });
+	    
+	    for(var i = 0; i < 5; i++){
+	        if(game.score > scores[i][1]){
+	            return true;
+	        }
+	    }
+	    return false;
+	},
 	die : function(){
-		game.currentState = game.state.DEATH;
+	    
+        //scores.push(['???', game.score]);
+        //storage.put('scores', scores);
+	    
+	    if(game.isHighScore()){
+	        game.currentState = game.state.HIGHSCORES_ADD;
+	    }
+	    else{
+	        game.highscores.update();	    
+	        game.currentState = game.state.HIGHSCORES_LIST;
+	    }
 	},
 	restart : function(){
 		this.init();
@@ -192,7 +264,7 @@ var game = {
 			}
 			this.scoreBoard.tick(theta);
 
-			if(game.menuSelection == game.menuState.SINGLEPLAYER)
+			if(game.currentMenu == game.menuState.SINGLEPLAYER)
 			    return
 			
 			this.player2.tick(theta);
@@ -230,10 +302,20 @@ var game = {
 			
 			break;
 		case game.state.MENU:
+		    game.menu.size[0] = 0.9*game.menu.size[0] + 0.1*0.75; 
 		    this.menu.tick(theta);
 			break;
-		case game.state.DEATH:
+		case game.state.HIGHSCORES_LIST:
+		    
+		    
+		    game.highscores.size[0] = 0.9*game.highscores.size[0] + 0.1*0.9; 
+		    game.highscores.tick(theta);
 			break;
+			
+        case game.state.HIGHSCORES_ADD:
+            game.highscoresAdd.size[0] = 0.9*game.highscoresAdd.size[0] + 0.1*0.9; 
+            game.highscoresAdd.tick(theta);
+            break;
 		}
 	},
 	draw : function(gl){
@@ -250,7 +332,7 @@ var game = {
         var ratio = Main.WIDTH / Main.HEIGHT;
         var model_projection = mat4.lookAt([0,0,-3], [0,0,0], [0,1,0]);
         var model_view_projection = mat4.frustum(-ratio, ratio, -1, 1, 2, 6);
-        if(game.menuSelection == game.menuState.SINGLEPLAYER)
+        if(game.currentMenu == game.menuState.SINGLEPLAYER)
             model_projection = mat4.rotate(model_projection, this.smooth[0]*-0.1, [0,1,0]);
         if(game.currentState == game.state.MENU)
             model_projection = mat4.rotate(model_projection, this.smooth[1]*-0.1, [1,0,0]);
@@ -279,6 +361,12 @@ var game = {
             break;
         case(game.state.PAUSE):
             this.pause.draw(gl);
+            break;
+        case(game.state.HIGHSCORES_ADD):
+            this.highscoresAdd.draw(gl);
+            break;
+        case(game.state.HIGHSCORES_LIST):
+            this.highscores.draw(gl);
             break;
         case(game.state.MENU):
             this.menu.draw(gl);

@@ -1,3 +1,130 @@
+HighscoresAdd = function(){
+    
+    var bg = new Square();
+    bg.texture.enabled = true;
+    bg.texture.fromChar("0");
+    bg.color = [0,0,0,1];
+    bg.size  = [0,0.9/3,0];
+    bg.position = [0,-0.1,-0.5];
+    bg.texture.sprite = [1,23];
+    bg.texture.size = [15,5];
+    
+    
+    var t = Text("___");
+    t.position([0.12, -0.15, -0.53]);
+    
+    var selector = new Square();
+    selector.texture.enabled = false;
+    selector.color = [0.9,0.9,0.9,0.5];
+    selector.size = [0.22,0.07, 0];
+    selector.position = [-0.59, -0.25, -0.51];
+    
+    var ta = ["_", "_", "_"];
+    
+    return{
+        size : [0,0,0],
+        getName : function(){
+            return ta.join('').replace(/_/g, " ");
+        },
+        position : 0,
+        update : function(code){
+            if(code == KeyEvent.VK_BACK_SPACE){
+                if(ta[this.position] == "_"){
+                    this.position -= 1;
+                }
+                this.position = Math.max(0, this.position);
+                ta[this.position] = "_"; 
+                
+            }
+            else if(code > 64 && code < 91){
+                ta[this.position] = String.fromCharCode(code).toUpperCase();
+                if(this.position != 2){
+                    this.position += 1;
+                    ta[this.position] = "_";
+                }
+            }
+            t.update(ta.join(''));
+        },
+        tick : function(theta){
+            bg.size[0] = this.size[0];
+            if(bg.size[0] > 0.85){
+                selector.color[3] = selector.color[3]*0.8 + 0.5*0.2;
+            }
+            else{
+                selector.color[3] = 0;
+            }
+        },
+        draw : function(gl){
+            bg.draw(gl);
+            t.draw(gl);
+            selector.draw(gl);
+        }
+    };
+};
+
+Highscores = function(){
+    var bg = new Square();
+    bg.texture.enabled = true;
+    bg.texture.fromChar("0");
+    bg.color = [0,0,0,1];
+    bg.size  = [0.0,0.9/1.3,0];
+    bg.position = [0,-0.1,-0.5];
+    bg.texture.sprite = [17,17];
+    bg.texture.size = [15,12];
+    
+    var selector = new Square();
+    selector.texture.enabled = false;
+    selector.color = [0.9,0.9,0.9,0.5];
+    selector.size = [0.2,0.07, 0];
+    selector.position = [0.65, -0.5, -0.51];
+    
+    function pad(number, length) {
+        var str = '' + number;
+        while (str.length < length) {
+            str = '0' + str;
+        }
+        return str;
+    }
+    
+    return{
+        
+        scores : [],
+        update : function(){
+            var scores = storage.get('scores');
+            scores.sort(function(a,b){
+                return b[1] - a[1]; 
+            });
+            if(!(scores instanceof Array))
+                scores = [];
+            for(var i = 0; i < Math.min(5, scores.length); i++){
+                var t = Text((i+1) + ". " + scores[i][0] + " "+pad(scores[i][1], 4));
+                t.position([0.55,0.17-i*0.1,-0.52]);
+                t.size([0.05,0.05,0]);
+                this.scores.push(t);
+            }
+        },
+        size : [0,0,0],
+        
+        tick : function(theta){
+            bg.size[0] = this.size[0];
+            if(bg.size[0] > 0.85){
+                selector.color[3] = selector.color[3]*0.8 + 0.5*0.2;
+            }
+            else{
+                selector.color[3] = 0;
+            }
+        },
+        draw : function(gl){
+            bg.draw(gl);
+            selector.draw(gl);
+            for(var i=0; i<this.scores.length;i++){
+                this.scores[i].draw(gl);
+            }
+        }
+    };
+    
+};
+
 Menu = function(){
     var s = new Square();
     s.texture.enabled = true;
@@ -16,15 +143,26 @@ Menu = function(){
     
     
     return{
+        
+        size : [0,0,0],
+        
         tick : function(gl){
-            var about= game.menuSelection == 3 ? 1 : 0;
-            selector.position[1] = (-1.1*(game.menuSelection+0.1+about)+1)*0.12;
+            var about= game.currentMenu == game.menuState.ABOUT ? 1 : 0;
+            selector.position[1] = (-1.1*(game.currentMenu+0.1+about)+1)*0.12;
+            
+            s.size[0] = this.size[0];
+            if(s.size[0] > 0.73){
+                selector.color[3] = selector.color[3]*0.8 + 0.5*0.2;
+            }
+            else{
+                selector.color[3] = 0;
+            }
         },
         draw : function(gl){
             s.draw(gl);
             selector.draw(gl);
         }
-    }
+    };
 };
 
 
@@ -80,25 +218,43 @@ Pause = function(){
 
 Text = function(string){
     var squares = [];
+    var size = [0.075,0.075,0];
+    var pos = [0,1.33, -0.01];
     for(var i = 0; i < string.length; i++){
         var s = new Square();
         s.texture.enabled = true;
         s.texture.fromChar(string.charAt(i));
         s.color = [0.3,0.3,0.3,1];
-        s.size  = [0.075,0.075,0];
-        s.position = [-i/10-(s.size[0]*10), 1.33, -0.01];
+        s.size  = size;
+        s.position = [pos[0]-i/(18-size[0]*100), pos[1], pos[2]];
         squares.push(s);
     }
     return {
-        size : function(size){
+        
+        update : function(string){
+            squares = [];
             for(var i = 0; i < string.length; i++){
-                squares[i].size = size;
+                var s = new Square();
+                s.texture.enabled = true;
+                s.texture.fromChar(string.charAt(i));
+                s.color = [0.3,0.3,0.3,1];
+                s.size  = size;
+                s.position = [pos[0]-i/(18-size[0]*100), pos[1], pos[2]];
+                squares.push(s);
             }
         },
-        position : function(pos){
+        
+        size : function(s){
+            for(var i = 0; i < string.length; i++){
+                squares[i].size = s;
+            }
+            size = s;
+        },
+        position : function(p){
             for(var i = 0; i < string.length; i++){
                 // TODO: This is some ugly code, make it better
-                squares[i].position = [pos[0]-i/(18-squares[i].size[0]*100), pos[1], pos[2]];
+                squares[i].position = [p[0]-i/(18-squares[i].size[0]*100), p[1], p[2]];
+                pos = p;
             }
         },
         tick : function(theta){
@@ -225,7 +381,7 @@ Object = function(objectType){
     object.collissionModifier = 0.8;
     object.alpha = 1;
     object.texture.enabled = true;
-    var type = ObjectTypes[objectType != 'B' ? 4 : Math.round(Math.random()*3)];
+    var type = ObjectTypes[objectType != 'B' ? 4 : Math.round(Math.random()*3)];//Math.round(Math.random()*3)];
     object.size  = type.size;
     object.texture.sprite = type.textureSprite;
     object.texture.size = type.textureSize;
@@ -285,7 +441,6 @@ Player = function(){
     player.texture.sprite = [0,6];
     player.texture.size = [4,4];
     
-    
     var forkObject = new Square();
     forkObject.color = [1,1,1,0];
     forkObject.size  = [0.2, 0.2, 1];
@@ -294,9 +449,6 @@ Player = function(){
     forkObject.texture.sprite = [4,6];
     forkObject.collissionModifier = 0.6,
     forkObject.texture.size = [4,4];
-    
-    
-    
     
     var isWallColliding = function(o){ // d = 1 left wall; d = -1 right wall
         if(o.disabled) return false;
