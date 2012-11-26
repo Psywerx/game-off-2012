@@ -1,3 +1,42 @@
+Restart = function(){
+    var bg = new Square();
+    bg.texture.enabled = true;
+    bg.texture.fromChar("0");
+    bg.color = [0,0,0,1];
+    bg.size  = [0,0.9/3,0];
+    bg.position = [0,-0.1,-0.5];
+    bg.texture.sprite = [1,17];
+    bg.texture.size = [15,5];
+    
+    var selector = new Square();
+    selector.texture.enabled = false;
+    selector.color = [0.9,0.9,0.9,0.5];
+    selector.size = [0.22,0.07, 0];
+    selector.position = [0.02, -0.13, -0.51];
+    
+    
+    return {
+        position : 0,
+        size : [0,0,0],
+        tick : function(theta){
+            selector.position[1] = this.position*(-0.13)-0.13;
+            bg.size[0] = this.size[0];
+            if(bg.size[0] > 0.85){
+                selector.color[3] = selector.color[3]*0.8 + 0.5*0.2;
+            }
+            else{
+                selector.color[3] = 0;
+            }
+        },
+        draw : function(gl){
+            bg.draw(gl);
+            selector.draw(gl);
+        }
+    };
+    
+};
+
+
 HighscoresAdd = function(){
     
     var bg = new Square();
