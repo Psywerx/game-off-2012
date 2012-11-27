@@ -1,26 +1,164 @@
+Restart = function(){
+    var bg = new Square();
+    bg.texture.enabled = true;
+    bg.texture.fromChar("0");
+    bg.color = [0,0,0,1];
+    bg.size  = [0,0.9/3,0];
+    bg.position = [0,-0.1,-0.5];
+    bg.texture.sprite = [1,17];
+    bg.texture.size = [15,5];
+    
+    var selector = new Square();
+    selector.texture.enabled = false;
+    selector.color = [0.9,0.9,0.9,0.5];
+    selector.size = [0.22,0.07, 0];
+    selector.position = [0.02, -0.13, -0.51];
+    
+    
+    return {
+        position : 0,
+        size : [0,0,0],
+        tick : function(theta){
+            selector.position[1] = this.position*(-0.13)-0.13;
+            bg.size[0] = this.size[0];
+            if(bg.size[0] > 0.85){
+                selector.color[3] = selector.color[3]*0.8 + 0.5*0.2;
+            }
+            else{
+                selector.color[3] = 0;
+            }
+        },
+        draw : function(gl){
+            bg.draw(gl);
+            selector.draw(gl);
+        }
+    };
+    
+};
+
+
+HighscoresAdd = function(){
+    
+    var bg = new Square();
+    bg.texture.enabled = true;
+    bg.texture.fromChar("0");
+    bg.color = [0,0,0,1];
+    bg.size  = [0,0.9/3,0];
+    bg.position = [0,-0.1,-0.5];
+    bg.texture.sprite = [1,23];
+    bg.texture.size = [15,5];
+    
+    
+    var t = Text("___");
+    t.position([0.12, -0.15, -0.53]);
+    
+    var selector = new Square();
+    selector.texture.enabled = false;
+    selector.color = [0.9,0.9,0.9,0.5];
+    selector.size = [0.22,0.07, 0];
+    selector.position = [-0.59, -0.25, -0.51];
+    
+    var ta = ["_", "_", "_"];
+    
+    return{
+        size : [0,0,0],
+        getName : function(){
+            return ta.join('').replace(/_/g, " ");
+        },
+        position : 0,
+        update : function(code){
+            if(code == KeyEvent.VK_BACK_SPACE){
+                if(ta[this.position] == "_"){
+                    this.position -= 1;
+                }
+                this.position = Math.max(0, this.position);
+                ta[this.position] = "_"; 
+                
+            }
+            else if(code > 64 && code < 91){
+                ta[this.position] = String.fromCharCode(code).toUpperCase();
+                if(this.position != 2){
+                    this.position += 1;
+                    ta[this.position] = "_";
+                }
+            }
+            t.update(ta.join(''));
+        },
+        tick : function(theta){
+            bg.size[0] = this.size[0];
+            if(bg.size[0] > 0.85){
+                selector.color[3] = selector.color[3]*0.8 + 0.5*0.2;
+            }
+            else{
+                selector.color[3] = 0;
+            }
+        },
+        draw : function(gl){
+            bg.draw(gl);
+            t.draw(gl);
+            selector.draw(gl);
+        }
+    };
+};
+
 Highscores = function(){
     var bg = new Square();
     bg.texture.enabled = true;
     bg.texture.fromChar("0");
     bg.color = [0,0,0,1];
-    bg.size  = [0.9,0.9/1.3,0];
+    bg.size  = [0.0,0.9/(15/11),0];
     bg.position = [0,-0.1,-0.5];
     bg.texture.sprite = [17,17];
-    bg.texture.size = [15,12];
+    bg.texture.size = [15,11];
     
     var selector = new Square();
     selector.texture.enabled = false;
     selector.color = [0.9,0.9,0.9,0.5];
     selector.size = [0.2,0.07, 0];
-    selector.position = [0.65, -0.5, -0.51];
+    selector.position = [0.65, -0.58, -0.51];
+    
+    function pad(number, length) {
+        var str = '' + number;
+        while (str.length < length) {
+            str = '0' + str;
+        }
+        return str;
+    }
     
     return{
+        
+        scores : [],
+        update : function(){
+            var scores = storage.get('scores');
+            if(!(scores instanceof Array))
+                scores = [];
+            scores.sort(function(a,b){
+                return b[1] - a[1]; 
+            });
+            for(var i = 0; i < Math.min(5, scores.length); i++){
+                var t = Text((i+1) + ". " + scores[i][0] + " "+pad(scores[i][1], 4));
+                t.position([0.55,0.17-i*0.1,-0.52]);
+                t.size([0.05,0.05,0]);
+                this.scores.push(t);
+            }
+        },
+        size : [0,0,0],
+        
         tick : function(theta){
-            
+            bg.size[0] = this.size[0];
+            if(bg.size[0] > 0.85){
+                selector.color[3] = selector.color[3]*0.8 + 0.5*0.2;
+            }
+            else{
+                selector.color[3] = 0;
+            }
         },
         draw : function(gl){
             bg.draw(gl);
             selector.draw(gl);
+            for(var i=0; i<this.scores.length;i++){
+                this.scores[i].draw(gl);
+            }
         }
     };
     
@@ -33,8 +171,8 @@ Menu = function(){
     s.color = [0,0,0,1];
     s.size  = [0.75,0.75/1.3,0];
     s.position = [0,-0.05,-0.5];
-    s.texture.sprite = [19,0];
-    s.texture.size = [13,10];
+    s.texture.sprite = [16,0];
+    s.texture.size = [10,7];
     
     var selector = new Square();
     selector.texture.enabled = false;
@@ -44,9 +182,20 @@ Menu = function(){
     
     
     return{
+        
+        size : [0,0,0],
+        
         tick : function(gl){
             var about= game.currentMenu == game.menuState.ABOUT ? 1 : 0;
             selector.position[1] = (-1.1*(game.currentMenu+0.1+about)+1)*0.12;
+            
+            s.size[0] = this.size[0];
+            if(s.size[0] > 0.73){
+                selector.color[3] = selector.color[3]*0.8 + 0.5*0.2;
+            }
+            else{
+                selector.color[3] = 0;
+            }
         },
         draw : function(gl){
             s.draw(gl);
@@ -108,25 +257,43 @@ Pause = function(){
 
 Text = function(string){
     var squares = [];
+    var size = [0.075,0.075,0];
+    var pos = [0,1.33, -0.01];
     for(var i = 0; i < string.length; i++){
         var s = new Square();
         s.texture.enabled = true;
         s.texture.fromChar(string.charAt(i));
         s.color = [0.3,0.3,0.3,1];
-        s.size  = [0.075,0.075,0];
-        s.position = [-i/10-(s.size[0]*10), 1.33, -0.01];
+        s.size  = size;
+        s.position = [pos[0]-i/(18-size[0]*100), pos[1], pos[2]];
         squares.push(s);
     }
     return {
-        size : function(size){
+        
+        update : function(string){
+            squares = [];
             for(var i = 0; i < string.length; i++){
-                squares[i].size = size;
+                var s = new Square();
+                s.texture.enabled = true;
+                s.texture.fromChar(string.charAt(i));
+                s.color = [0.3,0.3,0.3,1];
+                s.size  = size;
+                s.position = [pos[0]-i/(18-size[0]*100), pos[1], pos[2]];
+                squares.push(s);
             }
         },
-        position : function(pos){
+        
+        size : function(s){
+            for(var i = 0; i < string.length; i++){
+                squares[i].size = s;
+            }
+            size = s;
+        },
+        position : function(p){
             for(var i = 0; i < string.length; i++){
                 // TODO: This is some ugly code, make it better
-                squares[i].position = [pos[0]-i/(18-squares[i].size[0]*100), pos[1], pos[2]];
+                squares[i].position = [p[0]-i/(18-squares[i].size[0]*100), p[1], p[2]];
+                pos = p;
             }
         },
         tick : function(theta){
@@ -150,7 +317,7 @@ Score = function(){
         s.texture.fromChar("0");
         s.color = [0.3,0.3,0.3,1];
         s.size  = [0.075,0.075,0];
-        s.position = [-i/10+0.27, 1.33, -0.01];
+        s.position = [-i/10-0.01, 1.33, -0.01];
         squares.push(s);
     }
     
@@ -228,10 +395,10 @@ Object = function(objectType){
                            o.makeIdle();
                            game.score += 5;
                            p.small = true;
-                           p.size = [0.1, 0.1, 0];
+                           p.size = [0.35/2, 0.45/(6/4)/2, 1];
                            p.localTimeout(this.name,function(){
                                p.small = false;
-                               p.size = [0.2, 0.2, 0];
+                               p.size = [0.35, 0.45/(6/4), 1];
                            }, 3000);
                        }
                    },{ 
@@ -262,11 +429,11 @@ Object = function(objectType){
                    ];
     var object = new Square();
     object.color = [0,0,0,1];
-    object.position = [0, -1*game.bg.size[1], Math.random()/100];
+    object.position = [0, -1.5, Math.random()/100];
     object.collissionModifier = 0.8;
     object.alpha = 1;
     object.texture.enabled = true;
-    var type = ObjectTypes[objectType != 'B' ? Math.round(Math.random()*4) : Math.round(Math.random()*3)];//Math.round(Math.random()*3)];
+    var type = ObjectTypes[objectType != 'B' ? 4 : Math.round(Math.random()*3)];//Math.round(Math.random()*3)];
     object.size  = type.size;
     object.texture.sprite = type.textureSprite;
     object.texture.size = type.textureSize;
@@ -282,13 +449,13 @@ Object = function(objectType){
             game.objects.splice(game.objects.indexOf(this), 1);
             game.idleObjects.push(this);
             this.object.velocity = [0,0,0];
-            this.object.position[1] = -1*game.bg.size[1];
+            this.object.position[1] = -1.5;
             
         },
         tick : function(theta){
             this.velocity[1] = game.objectSpeed;
             object.position[1] += theta * this.velocity[1];
-            if(object.position[1] > game.bg.size[1]){
+            if(object.position[1] > game.bg.size[1]-0.5){
                 
                 this.makeIdle();
                 game.score += 1;
@@ -317,28 +484,25 @@ Object = function(objectType){
     };
 };
 
-Player = function(){
+Player = function(p2){
     var player = new Square();
     player.color = [0,0,0,1];
-    player.size  = [0.2, 0.2, 1];
-    player.position = [0, 0.9, 0];
+    player.size  = [0.35, 0.45/(6/4), 1];
+    player.position = [0, 0.87, 0];
     player.texture.enabled = true;
-    player.texture.sprite = [0,6];
-    player.texture.size = [4,4];
+    var offset = p2 ? 32 : 28;
+    player.texture.sprite = [6,offset];
+    player.texture.size = [6,4];
     player.alpha = 1;
-    
     
     var forkObject = new Square();
     forkObject.color = [1,1,1,0];
-    forkObject.size  = [0.2, 0.2, 1];
+    forkObject.size  = [0.35, 0.45/(6/4), 1];
     forkObject.position = [0, 0.9, 0.00001];
     forkObject.texture.enabled = true;
-    forkObject.texture.sprite = [4,6];
+    forkObject.texture.sprite = [0,offset];
     forkObject.collissionModifier = 0.6,
-    forkObject.texture.size = [4,4];
-    
-    
-    
+    forkObject.texture.size = [6,4];
     
     var isWallColliding = function(o){ // d = 1 left wall; d = -1 right wall
         if(o.disabled) return false;
@@ -379,16 +543,28 @@ Player = function(){
             player.position[0] += posChange;
             this.position = player.position;
             player.size = _.map(this.size, function(s,i){return s * 0.2 + player.size[i] * 0.8;}, this);
-            player.color[3] = this.alpha * 0.2 + player.color[3] * 0.8;
+            player.color[3] = this.alpha;
             forkObject.size = player.size;
             forkObject.position = player.position.slice();
 			forkObject.position[2] = player.position[2] - 0.00001;
             forkObject.position[0] += 1.45*player.size[0];
             
+            if(this.direction[0] != 0){
+                player.texture.sprite = [12,offset];
+                forkObject.texture.sprite = [12,offset];
+            }
+            else if(this.direction[1] != 0){
+                player.texture.sprite = [18,offset];
+                forkObject.texture.sprite = [18,offset];            
+            }
+            else{
+                player.texture.sprite = [6,offset];
+                forkObject.texture.sprite = [0,offset];
+            }
+            
             
             if(this.fork){
                 forkObject.color[3] = this.alpha * 0.2 + forkObject.color[3] * 0.8;
-                    //0.2 + 0.8*(this.invulnerable ? this.alpha : forkObject.color[3]);
             }
             else{
                 forkObject.color[3] = forkObject.color[3]*0.8;
@@ -418,16 +594,9 @@ Player = function(){
         }
     };
 };
-
-Background = function(){
-    
-    var bg = new Square();
-    bg.size = [1.7, 1.7, 1];
-    bg.color = [1, 1, 1, 1.0];
-    bg.position = [0,0,0.01];
-    
+Top = function(){
     var top = new Square();
-    top.size = [1.7, 1.7/8.3, 1];
+    top.size = [1.7, 1.8/8.3, 1];
     top.color = [0,0,0,1.0];
     top.position = [0, 1.34, 0.000];
     top.texture.enabled = true;
@@ -435,13 +604,47 @@ Background = function(){
     top.texture.size = [25,3];
     
     return{
-        size : bg.size,
         tick : function(theta){
-            bg.size = this.size;
         },
         draw : function(gl){
-            bg.draw(gl);
             top.draw(gl);
+        }
+    };
+};
+Background = function(){
+    
+    var bg = new Square();
+    bg.size = [1.7,1.7*4.2, 1];
+    bg.color = [1, 1, 1, 1.0];
+    bg.position = [0,-6,0.21];
+    bg.texture.enabled = true;
+    bg.texture.sprite = [32,0];
+    bg.texture.size = [15,63]; 
+    
+    var bg2 = new Square();
+    bg2.size = [1.7,1.7*4.2, 1];
+    bg2.color = [1, 1, 1, 1.0];
+    bg2.position = [0,-6,0.211];
+    bg2.texture.enabled = true;
+    bg2.texture.sprite = [47,0];
+    bg2.texture.size = [15,63]; 
+   
+    return{
+        size : bg.size,
+        tick : function(theta){
+            bg.position[1] += theta*0.05;
+            if(bg.position[1] > 8){
+                bg.position[1] = -9;
+            }
+            bg2.position[1] += theta*0.1;
+        }, 
+        draw : function(gl){
+            bg2.size = _.map(this.size, function(a){return a+0.15;});
+            bg2.position[0] = -0.055;
+            bg2.draw(gl);
+            bg.size = _.map(this.size, function(a){return a+0.15;});
+            bg.position[0] = -0.055;
+            bg.draw(gl);
         }
     };
 };
@@ -589,7 +792,7 @@ Square = function(){
             if(!this.texture.enabled) return [0,0,0,0,0,0,0,0];
             
 
-            var charWidth = [0.03125*this.texture.size[0], 0.03125*this.texture.size[1]];
+            var charWidth = [0.03125/2*this.texture.size[0], 0.03125/2*this.texture.size[1]];
             var u = this.texture.sprite[0]/this.texture.size[0];
             var v = this.texture.sprite[1]/this.texture.size[1];
             return tex = [

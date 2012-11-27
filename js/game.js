@@ -6,7 +6,9 @@ var game = {
 		PAUSE : 1,
 		DEATH : 2,
 		MENU : 3,
-		HIGHSCORES_LIST: 4
+		HIGHSCORES_LIST: 4,
+		HIGHSCORES_ADD : 5,
+		RESTART : 6
 	},
 	menuState :{
 	    SINGLEPLAYER : 0,
@@ -17,20 +19,22 @@ var game = {
 	currentMenu : 0,
 	init : function(){
 		this.bg = Background();
+		this.top = Top();
 		this.highscores = Highscores();
-		this.player = Player();
+		this.highscoresAdd = HighscoresAdd();
+		this.player = Player(false);
 		this.player.position[0] = 0;
 		
-		this.player2 = Player();
+		this.player2 = Player(true);
 		this.player2.position[0] = 101;
 		this.player2.position[2] = this.player.position[2] - 0.01;
 		this.player2.disabled = true;
 		this.objects = [];
 		this.idleObjects = [];
-		this.objectSpeed = 0.8;
+		this.objectSpeed = 1.2;
 		this.objectDelay = 1.600;
 		this.timePlayed = 0;
-		this.generatorCnt = 0;
+		this.generatorCnt = 1.6;
 		
 		// Generate bonuses:
 		for(var i=0, j=0; i < 17*2; [i++, j++]){
@@ -67,6 +71,7 @@ var game = {
 		this.menuDirection = [0,0];
 		this.smooth = [0,0];
 		this.scoreBoard = Score();
+		this.restart = Restart();
 		this.score = 0;
 		game.currentState = game.state.MENU;
 		game.menuChanged();
@@ -74,7 +79,6 @@ var game = {
 	},
 	generator : function(theta){
 		this.generatorCnt += theta;
-		
 		if(this.generatorCnt < this.objectDelay/this.objectSpeed) return;
 		this.generatorCnt = 0;
 		for(var j=0; j<Math.log(this.timePlayed);j++){
@@ -82,22 +86,35 @@ var game = {
 			var o = game.idleObjects[i];
 			game.idleObjects.splice(i, 1); // get random element;
 			o.velocity = [0, game.objectSpeed, 0];
-			o.position[1] += j*0.25;
+			o.position[1] -= j*0.25;
 			game.objects.push(o);
 		}
 	},
 	keydown : function(event){
 		switch (event.keyCode) {
 		case KeyEvent.VK_DOWN:
-		    game.menuDirection[0] = 1;
-		    game.currentMenu = (game.currentMenu+1)%4;
-		    game.menuChanged();
+		    if(game.currentState == game.state.MENU){
+    		    game.menuDirection[0] = 1;
+    		    game.currentMenu = (game.currentMenu+1)%4;
+    		    game.menuChanged();
+		    }
+		    else if (game.currentState == game.state.RESTART){
+		        game.restart.position += 1;
+		        game.restart.position %= 2;
+            }
 		    break;
 		case KeyEvent.VK_UP:
-            game.menuDirection[1] = -1;
-            game.currentMenu = (game.currentMenu-1)%4;
-            game.currentMenu = game.currentMenu < 0 ? 3 : game.currentMenu;
-            game.menuChanged();
+		    if(game.currentState == game.state.MENU){
+	            
+    		    game.menuDirection[1] = -1;
+                game.currentMenu = (game.currentMenu-1)%4;
+                game.currentMenu = game.currentMenu < 0 ? 3 : game.currentMenu;
+                game.menuChanged();
+		    }
+		    else if (game.currentState == game.state.RESTART){
+		        game.restart.position += 1;
+                game.restart.position %= 2;
+		    }
             break;
         case KeyEvent.VK_LEFT:
             game.player.direction[0] = 1;
@@ -112,25 +129,62 @@ var game = {
         	game.player2.direction[1] = -1;
             break;
 		case KeyEvent.VK_SPACE:
-			game.restart();
+		    if(game.currentState == game.state.PLAY){
+		        //game.restart();
+		        game.currentState = game.state.RESTART;
+		    }
 			break;
 		}
 	},
 	keyup : function(event){
+	    
+	    event.preventDefault();
+	    if(game.currentState == game.state.HIGHSCORES_ADD){
+            // Add score with name...
+            if(event.keyCode == KeyEvent.VK_RETURN){
+                
+                var scores = storage.get('scores');
+                if(!(scores instanceof Array))
+                    scores = [];
+                scores.push([game.highscoresAdd.getName(), game.score]);
+                storage.put('scores', scores);
+                
+                game.highscores.update();
+                game.currentState = game.state.HIGHSCORES_LIST;
+            }
+            else{
+                game.highscoresAdd.update(event.keyCode);
+            }
+            return;
+            
+        }
 		switch (event.keyCode) {
+		
 		case KeyEvent.VK_RETURN:
 		    if(game.currentState == game.state.MENU){
 		        if(game.currentMenu == game.menuState.ABOUT)
 		            window.location = "https://github.com/Psywerx/game-off-2012";
 		        else if(game.currentMenu == game.menuState.HIGHSCORES){
 		            game.currentState = game.state.HIGHSCORES_LIST;
+		            game.highscores.update();
+		            game.menu.size = [0,0,0];
 		        }
-		        else
+		        else{
 		            game.currentState = game.state.PLAY;
-		        
+		            game.menu.size = [0,0,0];
+		        }
+		            
+		    } else if(game.currentState == game.state.RESTART){
+		        if(game.restart.position == 0){
+		            game.init();
+		        }
+		        else{
+		            game.currentState = game.state.PLAY;
+		        }
 		    }
 		    else if(game.currentState == game.state.HIGHSCORES_LIST){
-		        game.currentState = game.state.MENU;
+		        game.init();
+		        game.highscores.size = [0,0,0];
 		    }
 		    break;
 		case KeyEvent.VK_DOWN:
@@ -169,11 +223,38 @@ var game = {
 	        game.player2.disabled = false;
 	    }
 	},
-	die : function(){
-		game.currentState = game.state.DEATH;
+	isHighScore: function(){
+	    var scores = storage.get('scores');
+	    if(!(scores instanceof Array))
+	        scores = [];
+	    
+	    if(scores.length < 5){
+	        return true;
+	    }
+	    
+	    scores.sort(function(a,b){
+	        return b[1] - a[1]; 
+	    });
+	    
+	    for(var i = 0; i < 5; i++){
+	        if(game.score > scores[i][1]){
+	            return true;
+	        }
+	    }
+	    return false;
 	},
-	restart : function(){
-		this.init();
+	die : function(){
+	    
+        //scores.push(['???', game.score]);
+        //storage.put('scores', scores);
+	    
+	    if(game.isHighScore()){
+	        game.currentState = game.state.HIGHSCORES_ADD;
+	    }
+	    else{
+	        game.highscores.update();	    
+	        game.currentState = game.state.HIGHSCORES_LIST;
+	    }
 	},
 	areColliding : function(a, b){
 		for (var i=1; i>=0; i--)
@@ -192,10 +273,15 @@ var game = {
 		switch(game.currentState){
 		case game.state.PAUSE:
 			break;
+		case game.state.RESTART:
+		    game.restart.size[0] = 0.9*game.restart.size[0] + 0.1*0.9; 
+		    game.restart.tick(theta);
+            break;
 		case game.state.PLAY:
 			this.generator(theta);
 			this.timePlayed += theta;
-			game.objectSpeed = Math.min(1.5, game.objectSpeed + this.timePlayed*0.000005);
+			console.log(game.objectSpeed + this.timePlayed*0.000005);
+			game.objectSpeed = Math.min(2.15,game.objectSpeed + this.timePlayed*0.000005);
 			this.bg.tick(theta);
 			
 			var prevPosition = game.player.position.slice();
@@ -212,6 +298,7 @@ var game = {
 			
 			this.player2.tick(theta);
 			var prevPosition2 = game.player2.position.slice();
+			
 			
 			if(game.player.alpha == 1 && game.player2.alpha == 1 && ( 
 			   game.areColliding(game.player, game.player2) ||
@@ -245,10 +332,20 @@ var game = {
 			
 			break;
 		case game.state.MENU:
+		    game.menu.size[0] = 0.9*game.menu.size[0] + 0.1*0.75; 
 		    this.menu.tick(theta);
 			break;
-		case game.state.DEATH:
+		case game.state.HIGHSCORES_LIST:
+		    
+		    
+		    game.highscores.size[0] = 0.9*game.highscores.size[0] + 0.1*0.9; 
+		    game.highscores.tick(theta);
 			break;
+			
+        case game.state.HIGHSCORES_ADD:
+            game.highscoresAdd.size[0] = 0.9*game.highscoresAdd.size[0] + 0.1*0.9; 
+            game.highscoresAdd.tick(theta);
+            break;
 		}
 	},
 	draw : function(gl){
@@ -277,17 +374,17 @@ var game = {
         
         
         
+        this.bg.draw(gl);
         this.objects.sort(function(a,b){
         	return b.position[2] - a.position[2]; 
         });
         for(var i=0; i < this.objects.length; i++){
         	this.objects[i].draw(gl);
         }
+        this.top.draw(gl);
+        this.scoreBoard.draw(gl);
         this.player.draw(gl);
         this.player2.draw(gl);
-        this.bg.draw(gl);
-        this.scoreBoard.draw(gl);
-        
         switch(game.currentState){
         case(game.state.DEATH):
             this.death.draw(gl);
@@ -295,13 +392,20 @@ var game = {
         case(game.state.PAUSE):
             this.pause.draw(gl);
             break;
+        case(game.state.HIGHSCORES_ADD):
+            this.highscoresAdd.draw(gl);
+            break;
         case(game.state.HIGHSCORES_LIST):
             this.highscores.draw(gl);
             break;
         case(game.state.MENU):
             this.menu.draw(gl);
             break;
+        case(game.state.RESTART):
+            this.restart.draw(gl);
+            break;
         }
+            
         
     },
 };
