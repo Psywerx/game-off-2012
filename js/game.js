@@ -299,6 +299,7 @@ var game = {
 			this.player2.tick(theta);
 			var prevPosition2 = game.player2.position.slice();
 			
+			
 			if(game.player.alpha == 1 && game.player2.alpha == 1 && ( 
 			   game.areColliding(game.player, game.player2) ||
 			   (game.player.fork && game.areColliding(game.player.forkObject, game.player2)) ||
