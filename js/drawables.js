@@ -198,20 +198,22 @@ Object = function(objectType){
                        collission : function(o,p){
                            o.makeIdle();
                            game.score += 5;
-                           p.localTimeout(this.name,function(){
+                           var name = this.name;
+                           p.localTimeout(name,function(){
                                p.alpha = 0.8;
                                p.foo = 4;
                                var blink = function(){
                                    if(p.alpha==0.8) p.alpha = 0.6; else p.alpha = 0.8;
                                    p.foo--;                                   
-                                   if(p.foo==0) {
+                                   if(p.foo==0){
                                        p.invulnerable = false;
                                        p.alpha = 1;
-                                   } else {
-                                       p.localTimeout(this.name, blink, 600);
+                                   }
+                                   else {
+                                       p.localTimeout(name, blink, 500);
                                    }
                                };
-                               p.localTimeout(this.name, blink, 600);
+                               p.localTimeout(name, blink, 500);
                            },2000);
                            p.invulnerable = true;
                            p.alpha = 0.5;
