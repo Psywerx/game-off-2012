@@ -22,19 +22,19 @@ var game = {
 		this.top = Top();
 		this.highscores = Highscores();
 		this.highscoresAdd = HighscoresAdd();
-		this.player = Player();
+		this.player = Player(false);
 		this.player.position[0] = 0;
 		
-		this.player2 = Player();
+		this.player2 = Player(true);
 		this.player2.position[0] = 101;
 		this.player2.position[2] = this.player.position[2] - 0.01;
 		this.player2.disabled = true;
 		this.objects = [];
 		this.idleObjects = [];
-		this.objectSpeed = 0.8;
+		this.objectSpeed = 1.2;
 		this.objectDelay = 1.600;
 		this.timePlayed = 0;
-		this.generatorCnt = 0;
+		this.generatorCnt = 1.6;
 		
 		// Generate bonuses:
 		for(var i=0, j=0; i < 17*2; [i++, j++]){
@@ -79,7 +79,6 @@ var game = {
 	},
 	generator : function(theta){
 		this.generatorCnt += theta;
-		
 		if(this.generatorCnt < this.objectDelay/this.objectSpeed) return;
 		this.generatorCnt = 0;
 		for(var j=0; j<Math.log(this.timePlayed);j++){
@@ -87,7 +86,7 @@ var game = {
 			var o = game.idleObjects[i];
 			game.idleObjects.splice(i, 1); // get random element;
 			o.velocity = [0, game.objectSpeed, 0];
-			o.position[1] += j*0.25;
+			o.position[1] -= j*0.25;
 			game.objects.push(o);
 		}
 	},
@@ -281,7 +280,8 @@ var game = {
 		case game.state.PLAY:
 			this.generator(theta);
 			this.timePlayed += theta;
-			game.objectSpeed = Math.min(1.5, game.objectSpeed + this.timePlayed*0.000005);
+			console.log(game.objectSpeed + this.timePlayed*0.000005);
+			game.objectSpeed = Math.min(2.15,game.objectSpeed + this.timePlayed*0.000005);
 			this.bg.tick(theta);
 			
 			var prevPosition = game.player.position.slice();

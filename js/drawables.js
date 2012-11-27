@@ -382,10 +382,10 @@ Object = function(objectType){
                            o.makeIdle();
                            game.score += 5;
                            p.small = true;
-                           p.size = [0.1, 0.1, 0];
+                           p.size = [0.35/2, 0.45/(6/4)/2, 1];
                            p.localTimeout(this.name,function(){
                                p.small = false;
-                               p.size = [0.2, 0.2, 0];
+                               p.size = [0.35, 0.45/(6/4), 1];
                            }, 3000);
                        }
                    },{ 
@@ -416,7 +416,7 @@ Object = function(objectType){
                    ];
     var object = new Square();
     object.color = [0,0,0,1];
-    object.position = [0, -1*game.bg.size[1], Math.random()/100];
+    object.position = [0, -1.5, Math.random()/100];
     object.collissionModifier = 0.8;
     object.alpha = 1;
     object.texture.enabled = true;
@@ -436,7 +436,7 @@ Object = function(objectType){
             game.objects.splice(game.objects.indexOf(this), 1);
             game.idleObjects.push(this);
             this.object.velocity = [0,0,0];
-            this.object.position[1] = -1*game.bg.size[1];
+            this.object.position[1] = -1.5;
             
         },
         tick : function(theta){
@@ -471,23 +471,24 @@ Object = function(objectType){
     };
 };
 
-Player = function(){
+Player = function(p2){
     var player = new Square();
     player.color = [0,0,0,1];
-    player.size  = [0.2, 0.2, 1];
-    player.position = [0, 0.9, 0];
+    player.size  = [0.35, 0.45/(6/4), 1];
+    player.position = [0, 0.87, 0];
     player.texture.enabled = true;
-    player.texture.sprite = [0,6];
-    player.texture.size = [4,4];
+    var offset = p2 ? 32 : 28;
+    player.texture.sprite = [6,offset];
+    player.texture.size = [6,4];
     
     var forkObject = new Square();
     forkObject.color = [1,1,1,0];
-    forkObject.size  = [0.2, 0.2, 1];
+    forkObject.size  = [0.35, 0.45/(6/4), 1];
     forkObject.position = [0, 0.9, 0.00001];
     forkObject.texture.enabled = true;
-    forkObject.texture.sprite = [4,6];
+    forkObject.texture.sprite = [0,offset];
     forkObject.collissionModifier = 0.6,
-    forkObject.texture.size = [4,4];
+    forkObject.texture.size = [6,4];
     
     var isWallColliding = function(o){ // d = 1 left wall; d = -1 right wall
         if(o.disabled) return false;
@@ -607,6 +608,9 @@ Background = function(){
         size : bg.size,
         tick : function(theta){
             bg.position[1] += theta*0.05;
+            if(bg.position[1] > 8){
+                bg.position[1] = -9;
+            }
             bg2.position[1] += theta*0.1;
         }, 
         draw : function(gl){
