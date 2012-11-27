@@ -19,6 +19,7 @@ var game = {
 	currentMenu : 0,
 	init : function(){
 		this.bg = Background();
+		this.top = Top();
 		this.highscores = Highscores();
 		this.highscoresAdd = HighscoresAdd();
 		this.player = Player();
@@ -372,17 +373,17 @@ var game = {
         
         
         
+        this.bg.draw(gl);
         this.objects.sort(function(a,b){
         	return b.position[2] - a.position[2]; 
         });
         for(var i=0; i < this.objects.length; i++){
         	this.objects[i].draw(gl);
         }
+        this.top.draw(gl);
+        this.scoreBoard.draw(gl);
         this.player.draw(gl);
         this.player2.draw(gl);
-        this.bg.draw(gl);
-        this.scoreBoard.draw(gl);
-        
         switch(game.currentState){
         case(game.state.DEATH):
             this.death.draw(gl);

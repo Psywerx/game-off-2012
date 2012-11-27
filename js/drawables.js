@@ -171,8 +171,8 @@ Menu = function(){
     s.color = [0,0,0,1];
     s.size  = [0.75,0.75/1.3,0];
     s.position = [0,-0.05,-0.5];
-    s.texture.sprite = [19,0];
-    s.texture.size = [13,10];
+    s.texture.sprite = [16,0];
+    s.texture.size = [10,7];
     
     var selector = new Square();
     selector.texture.enabled = false;
@@ -317,7 +317,7 @@ Score = function(){
         s.texture.fromChar("0");
         s.color = [0.3,0.3,0.3,1];
         s.size  = [0.075,0.075,0];
-        s.position = [-i/10+0.27, 1.33, -0.01];
+        s.position = [-i/10-0.01, 1.33, -0.01];
         squares.push(s);
     }
     
@@ -442,7 +442,7 @@ Object = function(objectType){
         tick : function(theta){
             this.velocity[1] = game.objectSpeed;
             object.position[1] += theta * this.velocity[1];
-            if(object.position[1] > game.bg.size[1]){
+            if(object.position[1] > game.bg.size[1]-0.5){
                 
                 this.makeIdle();
                 game.score += 1;
@@ -568,16 +568,9 @@ Player = function(){
         }
     };
 };
-
-Background = function(){
-    
-    var bg = new Square();
-    bg.size = [1.7, 1.7, 1];
-    bg.color = [1, 1, 1, 1.0];
-    bg.position = [0,0,0.01];
-    
+Top = function(){
     var top = new Square();
-    top.size = [1.7, 1.7/8.3, 1];
+    top.size = [1.7, 1.8/8.3, 1];
     top.color = [0,0,0,1.0];
     top.position = [0, 1.34, 0.000];
     top.texture.enabled = true;
@@ -585,13 +578,44 @@ Background = function(){
     top.texture.size = [25,3];
     
     return{
-        size : bg.size,
         tick : function(theta){
-            bg.size = this.size;
         },
         draw : function(gl){
-            bg.draw(gl);
             top.draw(gl);
+        }
+    };
+};
+Background = function(){
+    
+    var bg = new Square();
+    bg.size = [1.7,1.7*4.2, 1];
+    bg.color = [1, 1, 1, 1.0];
+    bg.position = [0,-6,0.21];
+    bg.texture.enabled = true;
+    bg.texture.sprite = [32,0];
+    bg.texture.size = [15,63]; 
+    
+    var bg2 = new Square();
+    bg2.size = [1.7,1.7*4.2, 1];
+    bg2.color = [1, 1, 1, 1.0];
+    bg2.position = [0,-6,0.211];
+    bg2.texture.enabled = true;
+    bg2.texture.sprite = [47,0];
+    bg2.texture.size = [15,63]; 
+   
+    return{
+        size : bg.size,
+        tick : function(theta){
+            bg.position[1] += theta*0.05;
+            bg2.position[1] += theta*0.1;
+        }, 
+        draw : function(gl){
+            bg2.size = _.map(this.size, function(a){return a+0.15;});
+            bg2.position[0] = -0.055;
+            bg2.draw(gl);
+            bg.size = _.map(this.size, function(a){return a+0.15;});
+            bg.position[0] = -0.055;
+            bg.draw(gl);
         }
     };
 };
@@ -739,7 +763,7 @@ Square = function(){
             if(!this.texture.enabled) return [0,0,0,0,0,0,0,0];
             
 
-            var charWidth = [0.03125*this.texture.size[0], 0.03125*this.texture.size[1]];
+            var charWidth = [0.03125/2*this.texture.size[0], 0.03125/2*this.texture.size[1]];
             var u = this.texture.sprite[0]/this.texture.size[0];
             var v = this.texture.sprite[1]/this.texture.size[1];
             return tex = [
