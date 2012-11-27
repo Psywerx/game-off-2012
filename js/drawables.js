@@ -106,16 +106,16 @@ Highscores = function(){
     bg.texture.enabled = true;
     bg.texture.fromChar("0");
     bg.color = [0,0,0,1];
-    bg.size  = [0.0,0.9/1.3,0];
+    bg.size  = [0.0,0.9/(15/11),0];
     bg.position = [0,-0.1,-0.5];
     bg.texture.sprite = [17,17];
-    bg.texture.size = [15,12];
+    bg.texture.size = [15,11];
     
     var selector = new Square();
     selector.texture.enabled = false;
     selector.color = [0.9,0.9,0.9,0.5];
     selector.size = [0.2,0.07, 0];
-    selector.position = [0.65, -0.5, -0.51];
+    selector.position = [0.65, -0.58, -0.51];
     
     function pad(number, length) {
         var str = '' + number;
@@ -534,6 +534,19 @@ Player = function(p2){
             forkObject.position = player.position.slice();
 			forkObject.position[2] = player.position[2] - 0.00001;
             forkObject.position[0] += 1.45*player.size[0];
+            
+            if(this.direction[0] != 0){
+                player.texture.sprite = [12,offset];
+                forkObject.texture.sprite = [12,offset];
+            }
+            else if(this.direction[1] != 0){
+                player.texture.sprite = [18,offset];
+                forkObject.texture.sprite = [18,offset];            
+            }
+            else{
+                player.texture.sprite = [6,offset];
+                forkObject.texture.sprite = [0,offset];
+            }
             
             
             if(this.fork){
