@@ -345,10 +345,9 @@ Object = function(objectType){
     var ObjectTypes = [
                    { 
                        name: "pull",
-                       size: [0.1,0.1/2,0],
-                       textureSprite : [0,11],
-                       textureSize : [2,1],
-                       collissionModifier : 0.8,
+                       size: [0.1,0.1,0],
+                       textureSprite : [8,9],
+                       textureSize : [3,3],
                        collission : function(o,p){
                            game.objectSpeed -= 0.25;
                            game.objectSpeed = Math.max(0.2, game.objectSpeed);
@@ -374,9 +373,9 @@ Object = function(objectType){
                        }
                    },{ 
                        name: "star",
-                       size: [0.1,0.1/2,0],
-                       textureSprite : [4,11],
-                       textureSize : [2,1],
+                       size: [0.1,0.1,0],
+                       textureSprite : [8,6],
+                       textureSize : [3,3],
                        collissionModifier : 0.8,
                        collission : function(o,p){
                            o.makeIdle();
