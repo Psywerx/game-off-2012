@@ -394,10 +394,10 @@ Object = function(objectType){
                            o.makeIdle();
                            game.score += 5;
                            p.small = true;
-                           p.size = [0.35/2, 0.45/(6/4)/2, 1];
+                           p.size = [0.3/2, 0.3/(5/4)/2, 1];
                            p.localTimeout(this.name,function(){
                                p.small = false;
-                               p.size = [0.35, 0.45/(6/4), 1];
+                               p.size = [0.3, 0.3/(5/4), 1];
                            }, 3000);
                        }
                    },{ 
@@ -432,7 +432,7 @@ Object = function(objectType){
     object.collissionModifier = 0.8;
     object.alpha = 1;
     object.texture.enabled = true;
-    var type = ObjectTypes[objectType != 'B' ? 4 : Math.round(Math.random()*3)];//Math.round(Math.random()*3)];
+    var type = ObjectTypes[objectType != 'B' ? 3 : Math.round(Math.random()*3)];//Math.round(Math.random()*3)];
     object.size  = type.size;
     object.texture.sprite = type.textureSprite;
     object.texture.size = type.textureSize;
@@ -486,22 +486,22 @@ Object = function(objectType){
 Player = function(p2){
     var player = new Square();
     player.color = [0,0,0,1];
-    player.size  = [0.35, 0.45/(6/4), 1];
+    player.size  = [0.3, 0.3/(5/4), 1];
     player.position = [0, 0.87, 0];
     player.texture.enabled = true;
     var offset = p2 ? 32 : 28;
-    player.texture.sprite = [6,offset];
-    player.texture.size = [6,4];
+    player.texture.sprite = [0,offset];
+    player.texture.size = [5,4];
     player.alpha = 1;
     
     var forkObject = new Square();
     forkObject.color = [1,1,1,0];
-    forkObject.size  = [0.35, 0.45/(6/4), 1];
+    player.size  = [0.3, 0.3/(5/4), 1];
     forkObject.position = [0, 0.9, 0.00001];
     forkObject.texture.enabled = true;
     forkObject.texture.sprite = [0,offset];
     forkObject.collissionModifier = 0.6,
-    forkObject.texture.size = [6,4];
+    forkObject.texture.size = [5,4];
     
     var isWallColliding = function(o){ // d = 1 left wall; d = -1 right wall
         if(o.disabled) return false;
@@ -521,6 +521,7 @@ Player = function(p2){
         small : false,
         invulnerable : false,
         disabled : false,
+        prevx : 0,
         setPosition : function(pos){
             player.position = pos;
             forkObject.position = player.position.slice();
@@ -543,41 +544,42 @@ Player = function(p2){
             this.position = player.position;
             player.size = _.map(this.size, function(s,i){return s * 0.2 + player.size[i] * 0.8;}, this);
             player.color[3] = this.alpha;
+            forkObject.color[3] = this.alpha;
             forkObject.size = player.size;
-            forkObject.position = player.position.slice();
-			forkObject.position[2] = player.position[2] - 0.00001;
-            forkObject.position[0] += 1.45*player.size[0];
+            forkObject.position[2] = player.position[2] - 0.00001;
+            forkObject.position[1] = player.position[1];
             
+ 
+            if(!this.fork){
+                this.prevx = Math.max(0, this.prevx-theta*10);
+                forkObject.position[0] = this.prevx*1.45*player.size[0]+player.position[0]; //0.8*1.45*player.size[0]
+            }
+            else{
+                this.prevx = Math.min(1, this.prevx+theta*4);
+                forkObject.position[0] = this.prevx*1.45*player.size[0]+player.position[0];
+            }
             if(this.direction[0] != 0){
-                player.texture.sprite = [12,offset];
-                forkObject.texture.sprite = [12,offset];
+                player.texture.sprite = [5,offset];
+                forkObject.texture.sprite = [5,offset];
             }
             else if(this.direction[1] != 0){
-                player.texture.sprite = [18,offset];
-                forkObject.texture.sprite = [18,offset];            
+                player.texture.sprite = [10,offset];
+                forkObject.texture.sprite = [10,offset];            
             }
             else{
-                player.texture.sprite = [6,offset];
+                player.texture.sprite = [0,offset];
                 forkObject.texture.sprite = [0,offset];
-            }
-            
-            
-            if(this.fork){
-                forkObject.color[3] = this.alpha * 0.2 + forkObject.color[3] * 0.8;
-            }
-            else{
-                forkObject.color[3] = forkObject.color[3]*0.8;
             }
 
             if (isWallColliding(player)) {
                 var collidingWall = player.position[0]/Math.abs(player.position[0]); // -1 left, 1 right
                 player.position[0]     = collidingWall*(game.bg.size[0]-forkObject.size[0]);
-                forkObject.position[0] = player.position[0] + 1.45*player.size[0];
+                forkObject.position[0] = this.prevx*1.45*player.size[0]+player.position[0];
                 this.speed[0] = 0;
             }
             if(this.fork && isWallColliding(forkObject)){
                 forkObject.position[0] = game.bg.size[0]-forkObject.size[0];
-                player.position[0] = forkObject.position[0] - 1.45*player.size[0];
+                player.position[0] = forkObject.position[0] - this.prevx*1.45*player.size[0];
                 this.speed[0] = 0;
             }
         },
