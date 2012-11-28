@@ -280,7 +280,6 @@ var game = {
 		case game.state.PLAY:
 			this.generator(theta);
 			this.timePlayed += theta;
-			console.log(game.objectSpeed + this.timePlayed*0.000005);
 			game.objectSpeed = Math.min(2.15,game.objectSpeed + this.timePlayed*0.000005);
 			this.bg.tick(theta);
 			
@@ -298,6 +297,7 @@ var game = {
 			
 			this.player2.tick(theta);
 			var prevPosition2 = game.player2.position.slice();
+			
 			
 			if(game.player.alpha == 1 && game.player2.alpha == 1 && ( 
 			   game.areColliding(game.player, game.player2) ||

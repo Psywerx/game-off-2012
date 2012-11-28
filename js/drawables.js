@@ -345,10 +345,9 @@ Object = function(objectType){
     var ObjectTypes = [
                    { 
                        name: "pull",
-                       size: [0.1,0.1/2,0],
-                       textureSprite : [0,11],
-                       textureSize : [2,1],
-                       collissionModifier : 0.8,
+                       size: [0.1,0.1,0],
+                       textureSprite : [8,9],
+                       textureSize : [3,3],
                        collission : function(o,p){
                            game.objectSpeed -= 0.25;
                            game.objectSpeed = Math.max(0.2, game.objectSpeed);
@@ -365,18 +364,31 @@ Object = function(objectType){
                        collission : function(o,p){
                            o.makeIdle();
                            game.score += 5;
-                           p.localTimeout(this.name,function(){
-                               p.invulnerable = false;
-                               p.alpha = 1;
-                           },3000);
+                           var name = this.name;
+                           p.localTimeout(name,function(){
+                               p.alpha = 0.8;
+                               p.foo = 4;
+                               var blink = function(){
+                                   if(p.alpha==0.8) p.alpha = 0.6; else p.alpha = 0.8;
+                                   p.foo--;                                   
+                                   if(p.foo==0){
+                                       p.invulnerable = false;
+                                       p.alpha = 1;
+                                   }
+                                   else {
+                                       p.localTimeout(name, blink, 500);
+                                   }
+                               };
+                               p.localTimeout(name, blink, 500);
+                           },2000);
                            p.invulnerable = true;
                            p.alpha = 0.5;
                        }
                    },{ 
                        name: "star",
-                       size: [0.1,0.1/2,0],
-                       textureSprite : [4,11],
-                       textureSize : [2,1],
+                       size: [0.1,0.1,0],
+                       textureSprite : [8,6],
+                       textureSize : [3,3],
                        collissionModifier : 0.8,
                        collission : function(o,p){
                            o.makeIdle();
@@ -480,6 +492,7 @@ Player = function(p2){
     var offset = p2 ? 32 : 28;
     player.texture.sprite = [6,offset];
     player.texture.size = [6,4];
+    player.alpha = 1;
     
     var forkObject = new Square();
     forkObject.color = [1,1,1,0];
@@ -550,14 +563,12 @@ Player = function(p2){
             
             
             if(this.fork){
-                forkObject.color[3] = 0.2 + 0.8*(this.invulnerable ? this.alpha : forkObject.color[3]);
+                forkObject.color[3] = this.alpha * 0.2 + forkObject.color[3] * 0.8;
             }
             else{
                 forkObject.color[3] = forkObject.color[3]*0.8;
             }
-            if(this.fork && this.invulnerable){
-                forkObject.color[3] = this.alpha;
-            }
+
             if (isWallColliding(player)) {
                 var collidingWall = player.position[0]/Math.abs(player.position[0]); // -1 left, 1 right
                 player.position[0]     = collidingWall*(game.bg.size[0]-forkObject.size[0]);
