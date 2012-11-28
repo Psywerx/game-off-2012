@@ -432,7 +432,7 @@ Object = function(objectType){
     object.collissionModifier = 0.8;
     object.alpha = 1;
     object.texture.enabled = true;
-    var type = ObjectTypes[objectType != 'B' ? 3 : Math.round(Math.random()*3)];//Math.round(Math.random()*3)];
+    var type = ObjectTypes[objectType != 'B' ? 4 : Math.round(Math.random()*3)];//Math.round(Math.random()*3)];
     object.size  = type.size;
     object.texture.sprite = type.textureSprite;
     object.texture.size = type.textureSize;
