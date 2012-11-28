@@ -280,7 +280,6 @@ var game = {
 		case game.state.PLAY:
 			this.generator(theta);
 			this.timePlayed += theta;
-			console.log(game.objectSpeed + this.timePlayed*0.000005);
 			game.objectSpeed = Math.min(2.15,game.objectSpeed + this.timePlayed*0.000005);
 			this.bg.tick(theta);
 			
