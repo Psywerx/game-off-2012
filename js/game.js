@@ -49,9 +49,9 @@ var game = {
 		}
 		
 		// Generate obstacles:
-		for(var i=0, j=0; i < 7*20; [i++, j++]){
-			var o = Object('O');
-			var position = game.bg.size[0]-o.object.size[0] - j*(0.1+o.object.size[0]*2) ;
+		for(i=0, j=0; i < 7*20; [i++, j++]){
+			o = Object('O');
+			position = game.bg.size[0]-o.object.size[0] - j*(0.1+o.object.size[0]*2) ;
 			if(Math.abs(position) > game.bg.size[0]){
 				j = 0;
 				position = game.bg.size[0]-o.object.size[0];
@@ -294,7 +294,7 @@ var game = {
 			this.scoreBoard.tick(theta);
 
 			if(game.currentMenu == game.menuState.SINGLEPLAYER)
-			    return
+			    return;
 			
 			
 			break;
@@ -374,5 +374,5 @@ var game = {
         }
             
         
-    },
+    }
 };

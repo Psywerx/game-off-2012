@@ -49,7 +49,7 @@ HighscoresAdd = function(){
     bg.texture.size = [15,5];
     
     
-    var t = Text("___");
+    var t = new Text("___");
     t.position([0.12, -0.15, -0.53]);
     
     var selector = new Square();
@@ -136,7 +136,7 @@ Highscores = function(){
                 return b[1] - a[1]; 
             });
             for(var i = 0; i < Math.min(5, scores.length); i++){
-                var t = Text((i+1) + ". " + scores[i][0] + " "+pad(scores[i][1], 4));
+                var t = new Text((i+1) + ". " + scores[i][0] + " "+pad(scores[i][1], 4));
                 t.position([0.55,0.17-i*0.1,-0.52]);
                 t.size([0.05,0.05,0]);
                 this.scores.push(t);
@@ -185,7 +185,7 @@ Menu = function(){
         
         size : [0,0,0],
         
-        tick : function(gl){
+        tick : function(theta){
             var about= game.currentMenu == game.menuState.ABOUT ? 1 : 0;
             selector.position[1] = (-1.1*(game.currentMenu+0.1+about)+1)*0.12;
             
@@ -357,9 +357,9 @@ Object = function(objectType){
                    
                    },{ 
                        name: "watch",
-                       size: [0.1,0.1/2,0],
-                       textureSprite : [2,11],
-                       textureSize : [2,1],
+                       size: [0.1,0.1,0],
+                       textureSprite : [11,6],
+                       textureSize : [3,3],
                        collissionModifier : 0.8,
                        collission : function(o,p){
                            o.makeIdle();
@@ -394,10 +394,10 @@ Object = function(objectType){
                            o.makeIdle();
                            game.score += 5;
                            p.small = true;
-                           p.size = [0.3/2, 0.3/(5/4)/2, 1];
+                           p.size = [0.25/1.5, 0.25/(5/4)/1.5, 1];
                            p.localTimeout(this.name,function(){
                                p.small = false;
-                               p.size = [0.3, 0.3/(5/4), 1];
+                               p.size = [0.25, 0.25/(5/4), 1];
                            }, 3000);
                        }
                    },{ 
@@ -417,8 +417,8 @@ Object = function(objectType){
                    }, {
                        name: "issue",
                        size: [0.2,0.2/3,0],
-                       textureSprite : [0,10],
-                       textureSize : [3,1],
+                       textureSprite : [14,9],
+                       textureSize : [6,2],
                        collissionModifier : 0.8,
                        collission : function(o,p){
                            if(!p.invulnerable)
@@ -438,8 +438,7 @@ Object = function(objectType){
     object.texture.size = type.textureSize;
     object.type  = type;
 
-    var particles = new Point();
-    
+
     return {
         object : object,
         velocity : [0,0,0],
@@ -486,7 +485,7 @@ Object = function(objectType){
 Player = function(p2){
     var player = new Square();
     player.color = [0,0,0,1];
-    player.size  = [0.3, 0.3/(5/4), 1];
+    player.size  = [0.25, 0.25/(5/4), 1];
     player.position = [0, 0.87, 0];
     player.texture.enabled = true;
     var offset = p2 ? 32 : 28;
@@ -496,11 +495,11 @@ Player = function(p2){
     
     var forkObject = new Square();
     forkObject.color = [1,1,1,0];
-    player.size  = [0.3, 0.3/(5/4), 1];
+    forkObject.size  = [0.25, 0.25/(5/4), 1];
     forkObject.position = [0, 0.9, 0.00001];
     forkObject.texture.enabled = true;
     forkObject.texture.sprite = [0,offset];
-    forkObject.collissionModifier = 0.6,
+    forkObject.collissionModifier = 0.6;
     forkObject.texture.size = [5,4];
     
     var isWallColliding = function(o){ // d = 1 left wall; d = -1 right wall
@@ -524,16 +523,7 @@ Player = function(p2){
         disabled : false,
         colide : false,
         prevx : 0,
-        setPosition : function(pos){
-            player.position = pos;
-            forkObject.position = player.position.slice();
-            if(!this.fork){
-                forkObject.position[0] = this.prevx*1.45*player.size[0]+player.position[0]; //0.8*1.45*player.size[0]
-            }
-            else{
-                forkObject.position[0] = this.prevx*1.45*player.size[0]+player.position[0];
-            }
-        },
+
         tick : function(theta){
             player.disabled = this.disabled;
             if(player.disabled) return;
@@ -813,9 +803,11 @@ Square = function(){
             
             gl.disableVertexAttribArray(program.positionLoc);
             gl.disableVertexAttribArray(program.colorLoc);
-            gl.disableVertexAttribArray(program.tecLoc);
+            gl.disableVertexAttribArray(program.texLoc);
         },
         tick: function(theta){
+            return theta;
+            return theta;
         },
         
         getTextureUV : function(){
@@ -826,12 +818,12 @@ Square = function(){
             var charWidth = [0.03125/2*this.texture.size[0], 0.03125/2*this.texture.size[1]];
             var u = this.texture.sprite[0]/this.texture.size[0];
             var v = this.texture.sprite[1]/this.texture.size[1];
-            return tex = [
+            return [
                     // Mapping coordinates for the vertices
                     (u + 1) * charWidth[0],  v * charWidth[1], 
                      u      * charWidth[0],  v * charWidth[1],
                     (u + 1) * charWidth[0], (v + 1) * charWidth[1], 
-                     u      * charWidth[0], (v + 1) * charWidth[1], 
+                     u      * charWidth[0], (v + 1) * charWidth[1]
             ];
         }
         
