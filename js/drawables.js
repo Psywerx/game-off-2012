@@ -402,9 +402,9 @@ Object = function(objectType){
                        }
                    },{ 
                        name: "fork",
-                       size: [0.1,0.1/2,0],
-                       textureSprite : [6,11],
-                       textureSize : [2,1],
+                       size: [0.1,0.1,0],
+                       textureSprite : [11,9],
+                       textureSize : [3,3],
                        collissionModifier : 0.8,
                        collission : function(o,p){
                            game.score += 5;
@@ -454,7 +454,7 @@ Object = function(objectType){
         tick : function(theta){
             this.velocity[1] = game.objectSpeed;
             object.position[1] += theta * this.velocity[1];
-            if(object.position[1] > game.bg.size[1]-0.5){
+            if(object.position[1] > 1.25){
                 
                 this.makeIdle();
                 game.score += 1;
@@ -516,30 +516,57 @@ Player = function(p2){
         size : player.size,
         collissionModifier : 0.6,
         forkObject : forkObject,
+        player : player,
         alpha : 1,
         fork : false,
         small : false,
         invulnerable : false,
         disabled : false,
+        colide : false,
         prevx : 0,
         setPosition : function(pos){
             player.position = pos;
             forkObject.position = player.position.slice();
-            forkObject.position[2] = player.position[2] - 0.00001;
-            forkObject.position[0] += 1.45*player.size[0];
+            if(!this.fork){
+                forkObject.position[0] = this.prevx*1.45*player.size[0]+player.position[0]; //0.8*1.45*player.size[0]
+            }
+            else{
+                forkObject.position[0] = this.prevx*1.45*player.size[0]+player.position[0];
+            }
         },
         tick : function(theta){
             player.disabled = this.disabled;
             if(player.disabled) return;
             this.speed[0] += theta*2;
             this.speed[1] += theta*2;
-            if(this.direction[0] == 0) this.speed[0] = 0;
-            if(this.direction[1] == 0) this.speed[1] = 0;
-            if(this.direction[0] != 0 && this.direction[1] != 0){
+            if(this.direction[0] == 0 && this.colide == 0) this.speed[0] = 0;
+            if(this.direction[1] == 0 && this.colide == 0) this.speed[1] = 0;
+            if(this.direction[0] != 0 && this.direction[1] != 0 && this.colide == 0){
                 this.speed[0] = 0;
                 this.speed[1] = 0;
             }
-            var posChange = (this.direction[0] + this.direction[1]) * theta * 2 * (this.speed[0]+this.speed[1]);
+            var otherPlayer = p2 ? game.player : game.player2;
+            if(this.alpha == 1 && otherPlayer.alpha == 1 && ( 
+                game.areColliding(this, otherPlayer) ||
+                (this.fork && game.areColliding(this.forkObject, otherPlayer)) ||
+                (otherPlayer.fork && game.areColliding(this, otherPlayer.forkObject)))){
+                    if(this.position[0] < otherPlayer.position[0]){
+                        if(this.direction[0] != 0){
+//                                otherPlayer.colide = 1;
+//                                otherPlayer.speed = this.speed.slice();
+                                this.speed = [0,0,0];
+                        }
+                    }
+                    if(this.position[0] > otherPlayer.position[0]){
+                        if(this.direction[1] != 0 && !isWallColliding(otherPlayer.player)){
+//                                otherPlayer.speed = this.speed.slice();
+//                                otherPlayer.colide = -1;
+                                this.speed = [0,0,0];
+                        }
+                    }
+                }
+            var posChange = (this.colide != 0 ? this.colide: (this.direction[0] + this.direction[1])) * theta * 2 * (this.speed[0]+this.speed[1]);
+            this.colide = 0;
             player.position[0] += posChange;
             this.position = player.position;
             player.size = _.map(this.size, function(s,i){return s * 0.2 + player.size[i] * 0.8;}, this);
@@ -582,6 +609,9 @@ Player = function(p2){
                 player.position[0] = forkObject.position[0] - this.prevx*1.45*player.size[0];
                 this.speed[0] = 0;
             }
+            
+            
+            
         },
         draw : function(gl){
             player.draw(gl);
