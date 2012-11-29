@@ -283,9 +283,10 @@ var game = {
 			game.objectSpeed = Math.min(2.15,game.objectSpeed + this.timePlayed*0.000005);
 			this.bg.tick(theta);
 			
-			var prevPosition = game.player.position.slice();
 
+			
 			this.player.tick(theta);
+			this.player2.tick(theta);
 			
 			for(var i=0; i < this.objects.length; i++){
 			    this.objects[i].tick(theta);
@@ -295,39 +296,6 @@ var game = {
 			if(game.currentMenu == game.menuState.SINGLEPLAYER)
 			    return
 			
-			this.player2.tick(theta);
-			var prevPosition2 = game.player2.position.slice();
-			
-			
-			if(game.player.alpha == 1 && game.player2.alpha == 1 && ( 
-			   game.areColliding(game.player, game.player2) ||
-			   (game.player.fork && game.areColliding(game.player.forkObject, game.player2)) ||
-			   (game.player2.fork && game.areColliding(game.player, game.player2.forkObject)))){
-			    if(game.player.position[0] < game.player2.position[0]){
-			        if(game.player.direction[0] != 0){
-			            game.player.setPosition(prevPosition);
-			            game.player.speed = [0,0,0];
-			            game.player.direction = [0,0];
-			        }
-			        if(game.player2.direction[1] != 0){
-			                game.player2.direction = [0,0];
-			                game.player2.setPosition(prevPosition2);
-			                game.player2.speed = [0,0,0];
-                    }
-			    }
-			    if(game.player.position[0] > game.player2.position[0]){
-                    if(game.player.direction[1] != 0){
-                        game.player.setPosition(prevPosition);
-                        game.player.speed = [0,0,0];
-                        game.player.direction = [0,0];
-                    }
-                    if(game.player2.direction[0] != 0){
-                        game.player2.setPosition(prevPosition2);
-                        game.player2.speed = [0,0,0];
-                        game.player2.direction = [0,0];
-                    }
-                }
-			}
 			
 			break;
 		case game.state.MENU:
