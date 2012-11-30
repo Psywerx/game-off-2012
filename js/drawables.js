@@ -186,7 +186,7 @@ Menu = function(){
         size : [0,0,0],
         
         tick : function(theta){
-            var about= game.currentMenu == game.menuState.ABOUT ? 1 : 0;
+            var about= game.currentMenu == game.menuState.ABOUT ? 1.32 : 0;
             selector.position[1] = (-1.1*(game.currentMenu+0.1+about)+1)*0.12;
             
             s.size[0] = this.size[0];
