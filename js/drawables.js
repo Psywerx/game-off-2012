@@ -395,9 +395,11 @@ Object = function(objectType){
                            game.score += 5;
                            p.small = true;
                            p.size = [0.25/1.5, 0.25/(5/4)/1.5, 1];
+                           p.moustache.size = [0.06/1.5,0.06/1.5,1];
                            p.localTimeout(this.name,function(){
                                p.small = false;
                                p.size = [0.25, 0.25/(5/4), 1];
+                               p.moustache.size = [0.06,0.06,1];
                            }, 3000);
                        }
                    },{ 
@@ -494,7 +496,7 @@ Player = function(p2){
     player.alpha = 1;
     
     var moustache = new Square();
-    moustache.size = [0.06,0.06,1]
+    moustache.size = [0.06,0.06,1];
     moustache.color = [1,1,1,1];
     moustache.texture.enabled = true;
     moustache.texture.sprite = [11,6];
@@ -524,6 +526,7 @@ Player = function(p2){
         collissionModifier : 0.6,
         forkObject : forkObject,
         player : player,
+        moustache : moustache,
         alpha : 1,
         fork : false,
         small : false,
@@ -615,13 +618,13 @@ Player = function(p2){
             player.draw(gl);
             forkObject.draw(gl);
             if(this.invulnerable){
-                moustache.position = player.position.slice(0)
+                moustache.position = player.position.slice();
                 moustache.position[1] -= 0.015;
                 moustache.position[2] -= 0.01;
                 moustache.color[3] = player.color[3];
                 moustache.draw(gl);
                 if(this.fork){
-                    moustache.position = forkObject.position.slice(0)
+                    moustache.position = forkObject.position.slice();
                     moustache.position[1] -= 0.015;
                     moustache.position[2] -= 0.01;
                     moustache.color[3] = forkObject.color[3];
