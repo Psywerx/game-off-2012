@@ -3,6 +3,14 @@ Main = {
 		
 	init : function(){
 		
+	    loadSound('res/die.wav', 'die');
+	    loadSound('res/power.wav', 'power');
+	    loadSound('res/C.wav', 'C');
+	    loadSound('res/D.wav', 'D');
+	    loadSound('res/E.wav', 'E');
+	    loadSound('res/F.wav', 'F');
+	    loadSound('res/G.wav', 'G');
+	    
 		$(document).keydown(game.keydown);
 		$(document).keyup(game.keyup);
 		$(window).focus(function(){

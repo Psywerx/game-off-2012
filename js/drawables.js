@@ -186,7 +186,7 @@ Menu = function(){
         size : [0,0,0],
         
         tick : function(theta){
-            var about= game.currentMenu == game.menuState.ABOUT ? 1 : 0;
+            var about= game.currentMenu == game.menuState.ABOUT ? 1.32 : 0;
             selector.position[1] = (-1.1*(game.currentMenu+0.1+about)+1)*0.12;
             
             s.size[0] = this.size[0];
@@ -349,6 +349,7 @@ Object = function(objectType){
                        textureSprite : [8,9],
                        textureSize : [3,3],
                        collission : function(o,p){
+                           playSound('power', 0);
                            game.objectSpeed -= 0.25;
                            game.objectSpeed = Math.max(0.2, game.objectSpeed);
                            o.makeIdle();
@@ -362,6 +363,7 @@ Object = function(objectType){
                        textureSize : [3,3],
                        collissionModifier : 0.8,
                        collission : function(o,p){
+                           playSound('power', 0);
                            o.makeIdle();
                            game.score += 5;
                            var name = this.name;
@@ -391,6 +393,7 @@ Object = function(objectType){
                        textureSize : [3,3],
                        collissionModifier : 0.8,
                        collission : function(o,p){
+                           playSound('power', 0);
                            o.makeIdle();
                            game.score += 5;
                            p.small = true;
@@ -407,6 +410,7 @@ Object = function(objectType){
                        textureSize : [3,3],
                        collissionModifier : 0.8,
                        collission : function(o,p){
+                           playSound('power', 0);
                            game.score += 5;
                            o.makeIdle();
                            p.localTimeout(this.name,function(){
