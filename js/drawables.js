@@ -493,6 +493,13 @@ Player = function(p2){
     player.texture.size = [5,4];
     player.alpha = 1;
     
+    var moustache = new Square();
+    moustache.size = [0.06,0.06,1]
+    moustache.color = [1,1,1,1];
+    moustache.texture.enabled = true;
+    moustache.texture.sprite = [11,6];
+    moustache.texture.size = [3,3]; 
+
     var forkObject = new Square();
     forkObject.color = [1,1,1,0];
     forkObject.size  = [0.25, 0.25/(5/4), 1];
@@ -502,6 +509,7 @@ Player = function(p2){
     forkObject.collissionModifier = 0.6;
     forkObject.texture.size = [5,4];
     
+
     var isWallColliding = function(o){ // d = 1 left wall; d = -1 right wall
         if(o.disabled) return false;
         return o.position[0] < -1*(game.bg.size[0]-o.size[0]) || o.position[0] > (game.bg.size[0]-o.size[0]);
@@ -606,6 +614,20 @@ Player = function(p2){
         draw : function(gl){
             player.draw(gl);
             forkObject.draw(gl);
+            if(this.invulnerable){
+                moustache.position = player.position.slice(0)
+                moustache.position[1] -= 0.02;
+                moustache.position[2] -= 0.01;
+                moustache.color[3] = player.color[3];
+                moustache.draw(gl);
+                if(this.fork){
+                    moustache.position = forkObject.position.slice(0)
+                    moustache.position[1] -= 0.02;
+                    moustache.position[2] -= 0.01;
+                    moustache.color[3] = forkObject.color[3];
+                    moustache.draw(gl);
+                }
+            }
         },
         localTimeout : function(name,f,t){
             if (this.timeouts[name]){
