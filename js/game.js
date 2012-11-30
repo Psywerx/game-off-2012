@@ -16,6 +16,10 @@ var game = {
 	    HIGHSCORES: 2,
 	    ABOUT: 3
 	},
+	sound : true,
+	sounds : {},
+    melody : ['C', 'G', 'E', 'G', 'D', 'F', 'E', 'D'],
+    note : 0,
 	currentMenu : 0,
 	init : function(){
 		this.bg = Background();
@@ -77,11 +81,15 @@ var game = {
 		game.menuChanged();
 		
 	},
+	soundCnt : 0,
 	generator : function(theta){
 		this.generatorCnt += theta;
 		if(this.generatorCnt < this.objectDelay/this.objectSpeed) return;
+		this.soundCnt += 1;
+        playSound(this.melody[this.note], 0);
+        this.note = (this.note + 1)%this.melody.length;
 		this.generatorCnt = 0;
-		for(var j=0; j<Math.log(this.timePlayed);j++){
+		for(var j=0; j<Math.max(0.1, Math.log(this.timePlayed));j++){
 			var i = Math.floor(Math.random() * game.idleObjects.length);
 			var o = game.idleObjects[i];
 			game.idleObjects.splice(i, 1); // get random element;
@@ -89,6 +97,7 @@ var game = {
 			o.position[1] -= j*0.25;
 			game.objects.push(o);
 		}
+		    
 	},
 	keydown : function(event){
 		switch (event.keyCode) {
@@ -139,6 +148,9 @@ var game = {
 	keyup : function(event){
 	    
 	    event.preventDefault();
+	    if(event.keyCode == KeyEvent.VK_S){
+	        game.sound = !game.sound;
+	    }
 	    if(game.currentState == game.state.HIGHSCORES_ADD){
             // Add score with name...
             if(event.keyCode == KeyEvent.VK_RETURN){
@@ -245,9 +257,8 @@ var game = {
 	},
 	die : function(){
 	    
-        //scores.push(['???', game.score]);
-        //storage.put('scores', scores);
-	    
+	    playSound("die", 0);
+	    this.note = 0;
 	    if(game.isHighScore()){
 	        game.currentState = game.state.HIGHSCORES_ADD;
 	    }
@@ -264,6 +275,7 @@ var game = {
 		return true;
 		
 	},
+	playCnt : 0,
 	tick : function(theta){
 		
 		// The left/right animation should be present always:
@@ -278,9 +290,10 @@ var game = {
 		    game.restart.tick(theta);
             break;
 		case game.state.PLAY:
-			this.generator(theta);
 			this.timePlayed += theta;
+			this.generator(theta);
 			game.objectSpeed = Math.min(2.15,game.objectSpeed + this.timePlayed*0.000005);
+			
 			this.bg.tick(theta);
 			
 

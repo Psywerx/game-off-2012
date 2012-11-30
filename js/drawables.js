@@ -349,6 +349,7 @@ Object = function(objectType){
                        textureSprite : [8,9],
                        textureSize : [3,3],
                        collission : function(o,p){
+                           playSound('power', 0);
                            game.objectSpeed -= 0.25;
                            game.objectSpeed = Math.max(0.2, game.objectSpeed);
                            o.makeIdle();
@@ -362,6 +363,7 @@ Object = function(objectType){
                        textureSize : [3,3],
                        collissionModifier : 0.8,
                        collission : function(o,p){
+                           playSound('power', 0);
                            o.makeIdle();
                            game.score += 5;
                            var name = this.name;
@@ -391,6 +393,7 @@ Object = function(objectType){
                        textureSize : [3,3],
                        collissionModifier : 0.8,
                        collission : function(o,p){
+                           playSound('power', 0);
                            o.makeIdle();
                            game.score += 5;
                            p.small = true;
@@ -407,6 +410,7 @@ Object = function(objectType){
                        textureSize : [3,3],
                        collissionModifier : 0.8,
                        collission : function(o,p){
+                           playSound('power', 0);
                            game.score += 5;
                            o.makeIdle();
                            p.localTimeout(this.name,function(){
