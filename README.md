@@ -6,9 +6,7 @@ Not just any hipster! Oh no, you are a mammalian dinosaur. A cute fuzzy creature
 
 But what's this? An internet meanie is using _Comic Sans_ for his Helvetica signs! And he's __flicking them your way__. Good god, is there nothing sacred anymore!? Avoid them all. Run away!
 
-Use the holy face moustache, glorious monocle like a sir and skirt around IKEA forks ... get a friend to help - it's dangerous to go alone.
-
-Still a better love story than Twilight.
+Use the holy face moustache, glorious monocle like a sir, and skirt around IKEA forks ... get a friend to help - it's dangerous to go alone.
 
 # Screenshots
 
