@@ -616,13 +616,13 @@ Player = function(p2){
             forkObject.draw(gl);
             if(this.invulnerable){
                 moustache.position = player.position.slice(0)
-                moustache.position[1] -= 0.02;
+                moustache.position[1] -= 0.015;
                 moustache.position[2] -= 0.01;
                 moustache.color[3] = player.color[3];
                 moustache.draw(gl);
                 if(this.fork){
                     moustache.position = forkObject.position.slice(0)
-                    moustache.position[1] -= 0.02;
+                    moustache.position[1] -= 0.015;
                     moustache.position[2] -= 0.01;
                     moustache.color[3] = forkObject.color[3];
                     moustache.draw(gl);
