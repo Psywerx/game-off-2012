@@ -20,3 +20,7 @@ Use the holy face moustache, glorious monocle like a sir, and skirt around IKEA 
 * [Underscore.js](https://github.com/documentcloud/underscore)
 * [gl-matrix](https://github.com/toji/gl-matrix)
 
+# Sounds
+
+* [Drums](http://audio.tutsplus.com/freebies/samples/studio-drums-sample-pack/) 
+* [Piano](http://ibeat.org/piano-chords-free/)

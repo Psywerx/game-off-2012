@@ -438,7 +438,7 @@ Object = function(objectType){
     object.collissionModifier = 0.8;
     object.alpha = 1;
     object.texture.enabled = true;
-    var type = ObjectTypes[objectType != 'B' ? 4 : Math.round(Math.random()*3)];//Math.round(Math.random()*3)];
+    var type = ObjectTypes[objectType != 'B' ? 1 : Math.round(Math.random()*3)];//Math.round(Math.random()*3)];
     object.size  = type.size;
     object.texture.sprite = type.textureSprite;
     object.texture.size = type.textureSize;
@@ -625,6 +625,15 @@ Player = function(p2){
                 moustache.position = player.position.slice();
                 moustache.position[1] -= 0.015;
                 moustache.position[2] -= 0.01;
+                if(this.direction[0] != 0){
+                    moustache.position[0] += 0.01;
+                    moustache.position[1] -= 0.005;
+                }
+                else if(this.direction[1] != 0){
+                    moustache.position[0] -= this.small ? 0.01/1.5 : 0.01;
+                    moustache.position[1] -= this.small ? 0.005/1.5 : 0.005;
+                }
+                
                 moustache.color[3] = player.color[3];
                 moustache.draw(gl);
                 if(this.fork){
@@ -632,6 +641,14 @@ Player = function(p2){
                     moustache.position[1] -= 0.015;
                     moustache.position[2] -= 0.01;
                     moustache.color[3] = forkObject.color[3];
+                    if(this.direction[0] != 0){
+                        moustache.position[0] += 0.01;
+                        moustache.position[1] -= 0.005;
+                    }
+                    else if(this.direction[1] != 0){
+                        moustache.position[0] -= this.small ? 0.01/1.5 : 0.01;
+                        moustache.position[1] -= this.small ? 0.005/1.5 : 0.005;
+                    }
                     moustache.draw(gl);
                 }
             }
